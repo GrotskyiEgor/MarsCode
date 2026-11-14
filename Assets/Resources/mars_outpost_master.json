@@ -1,0 +1,191 @@
+{
+  "missionTitle": "Mars Outpost: Trade-offs",
+  "attributionBadge": "Simulation is based on open NASA data (DONKI, RadLab, OSDR, Mars Trek) and CSA educational materials",
+  "sols": [
+    {
+      "solNumber": 1,
+      "availableEnergy": 4,
+      "baseRadiationDelta": 5,
+      "eventTitle": "Landing in Jezero Crater",
+      "eventDescription": "All systems nominal. Solar panels are generating maximum energy (4 units).",
+      "radlabMeasurement": {
+        "solNumber": 1,
+        "location": "Mars orbit",
+        "instrumentId": "Liulin-MO-CD-Orbit",
+        "realTimestamp": "2021-05-01T00:00",
+        "doseRate_uGy_hour": 16.02,
+        "dailyDose_uGy_day": 384.5,
+        "gameBaseRadiationDelta": 5
+      },
+      "nasaFact": "Base coordinates: 18.38°N, 77.58°E (NASA Mars Trek). Background radiation: 384.5 µGy/day (Liulin-MO-CD-Orbit)."
+    },
+    {
+      "solNumber": 2,
+      "availableEnergy": 4,
+      "baseRadiationDelta": 5,
+      "eventTitle": "Calm Martian Day",
+      "eventDescription": "A good time to start the greenhouse or water extraction.",
+      "radlabMeasurement": {
+        "solNumber": 2,
+        "location": "Mars orbit",
+        "instrumentId": "Liulin-MO-CD-Orbit",
+        "realTimestamp": "2021-05-02T22:52",
+        "doseRate_uGy_hour": 16.89,
+        "dailyDose_uGy_day": 405.4,
+        "gameBaseRadiationDelta": 5
+      },
+      "nasaFact": "Daily radiation dose: 405.4 µGy/day (NASA RadLab, recorded on 2021-05-02)."
+    },
+    {
+      "solNumber": 3,
+      "availableEnergy": 3,
+      "baseRadiationDelta": 5,
+      "eventTitle": "Dust Devil!",
+      "eventDescription": "Wind blew Martian dust onto the solar arrays. Only 3 units of energy are available today!",
+      "radlabMeasurement": {
+        "solNumber": 3,
+        "location": "Mars orbit",
+        "instrumentId": "Liulin-MO-CD-Orbit",
+        "realTimestamp": "2021-05-04T21:02",
+        "doseRate_uGy_hour": 17.55,
+        "dailyDose_uGy_day": 421.2,
+        "gameBaseRadiationDelta": 5
+      },
+      "nasaFact": "According to Mars mission data (Mars Trek), dust reduces atmospheric transparency and solar panel efficiency."
+    },
+    {
+      "solNumber": 4,
+      "availableEnergy": 4,
+      "baseRadiationDelta": 5,
+      "eventTitle": "Greenhouse Research",
+      "eventDescription": "Time to check how plants respond to Martian conditions.",
+      "radlabMeasurement": {
+        "solNumber": 4,
+        "location": "Mars orbit",
+        "instrumentId": "Liulin-MO-AB-Orbit",
+        "realTimestamp": "2021-05-06T19:53",
+        "doseRate_uGy_hour": 17.64,
+        "dailyDose_uGy_day": 423.4,
+        "gameBaseRadiationDelta": 5
+      },
+      "nasaFact": "NASA OSDR study (OSD-520): cosmic radiation slows down plant growth without shielding."
+    },
+    {
+      "solNumber": 5,
+      "availableEnergy": 4,
+      "baseRadiationDelta": 8,
+      "eventTitle": "RADAR ALERT: Solar Flare!",
+      "eventDescription": "An M7.6-class solar flare has been detected! A powerful solar storm is approaching.",
+      "radlabMeasurement": {
+        "solNumber": 5,
+        "location": "Mars surface",
+        "instrumentId": "MSL-RAD-Surface",
+        "realTimestamp": "2021-05-08T19:49",
+        "doseRate_uGy_hour": 8.09,
+        "dailyDose_uGy_day": 194.2,
+        "gameBaseRadiationDelta": 5
+      },
+      "nasaFact": "NASA DONKI (2024-09-30T23:37:00-FLR-001): M7.6-class flare from 2024-09-30."
+    },
+    {
+      "solNumber": 6,
+      "availableEnergy": 3,
+      "baseRadiationDelta": 10,
+      "eventTitle": "Final Day of Preparation",
+      "eventDescription": "Dust has reduced energy to 3 units, and the storm is almost here! Reinforce the habitat module in time!",
+      "radlabMeasurement": {
+        "solNumber": 6,
+        "location": "Mars orbit",
+        "instrumentId": "Liulin-MO-AB-Orbit",
+        "realTimestamp": "2021-05-10T19:53",
+        "doseRate_uGy_hour": 27.36,
+        "dailyDose_uGy_day": 656.6,
+        "gameBaseRadiationDelta": 5
+      },
+      "nasaFact": "Peak orbital dose before the storm: 656.6 µGy/day (Liulin-MO-AB-Orbit, RadLab)."
+    },
+    {
+      "solNumber": 7,
+      "availableEnergy": 3,
+      "baseRadiationDelta": 40,
+      "eventTitle": "SOLAR STORM IMPACT (X9.0)!",
+      "eventDescription": "Peak radiation! Without reinforced hull plating and shields, contamination will spike by +40%!",
+      "radlabMeasurement": {
+        "solNumber": 7,
+        "location": "Mars orbit",
+        "instrumentId": "Liulin-MO-CD-Orbit",
+        "realTimestamp": "2021-05-12T20:27",
+        "doseRate_uGy_hour": 16.9,
+        "dailyDose_uGy_day": 405.6,
+        "gameBaseRadiationDelta": 5
+      },
+      "nasaFact": "Real extreme flare from NASA DONKI: X9.0 class (2024-10-03T12:08:00-FLR-001)."
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Collect soil samples in the crater",
+      "nasaRef": "Terrain and geology of Jezero Crater (NASA Mars Trek)"
+    },
+    {
+      "id": 2,
+      "title": "Check greenhouse airtightness",
+      "nasaRef": "Closed-loop water cycle and food production (CSA Space Food Toolkit guide)"
+    },
+    {
+      "id": 3,
+      "title": "Calibrate radiation sensors",
+      "nasaRef": "Cross-check with NASA DONKI flare catalog (M7.6)"
+    },
+    {
+      "id": 4,
+      "title": "Biological plant experiment",
+      "nasaRef": "NASA OSDR studies OSD-520 and OSD-269"
+    },
+    {
+      "id": 5,
+      "title": "Reinforce the habitat module hull",
+      "nasaRef": "Reduces X9.0 storm damage on Sol 7 from +40% to +20% (OSDR OSD-336)"
+    },
+    {
+      "id": 6,
+      "title": "Transmit scientific report to Earth",
+      "nasaRef": "Radio signal delay between Mars and Earth: 4 to 24 minutes"
+    }
+  ],
+  "kidFriendlyCards": [
+    {
+      "linkedStudyId": "OSD-520",
+      "module": "Greenhouse",
+      "taskNumber": 4,
+      "kidTitle": "How do plants react to space radiation?",
+      "kidExplanation": "NASA experiments showed that without protection, radiation slows down the growth of roots and leaves. That's why crop yield in our greenhouse drops if we ignore radiation levels at the base!"
+    },
+    {
+      "linkedStudyId": "OSD-336",
+      "module": "Habitat",
+      "taskNumber": 5,
+      "kidTitle": "Why does the crew need thick shielding?",
+      "kidExplanation": "According to NASA OSDR medical research, prolonged radiation weakens astronauts' immune defenses. Reinforcing the habitat module keeps the crew healthy."
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Sol",
+      "definition": "A Martian day, lasting 24 hours and 39 minutes."
+    },
+    {
+      "term": "Solar flare",
+      "definition": "A powerful explosion on the Sun that releases a stream of dangerous radiation into space."
+    },
+    {
+      "term": "Dosimetry",
+      "definition": "The measurement of the amount of radiation absorbed by astronauts or instruments."
+    },
+    {
+      "term": "Regolith",
+      "definition": "A layer of loose dust and broken rock covering the surface of Mars."
+    }
+  ]
+}
