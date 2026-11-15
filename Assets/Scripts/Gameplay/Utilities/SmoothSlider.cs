@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class SmoothSlider : MonoBehaviour
 {
     [Header("Настройки плавности")]
-    [SerializeField] private float changeSpeed = 35f;
+    [SerializeField] private float changeSpeed = 20f;
 
     private Slider slider;
     private float targetValue;

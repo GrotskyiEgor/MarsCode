@@ -58,16 +58,17 @@ namespace MarsOutpost
 
         // Энергия / Солнечные панели
         [Header("Солнечные панели")]
-        [SerializeField] private GameObject solarPanelOnVisual;  // Объект/картинка "Включено"
-        [SerializeField] private GameObject solarPanelOffVisual; // Объект/картинка "Выключено"
-        private bool solarPanelsOpenedToday = false; // Флаг: открывались ли панели в этом соле
-        private bool solarPanelsBeOpenedToday = false; // Флаг: открывались ли панели в этом соле
+        [SerializeField] private GameObject solarPanelOnVisual;
+        [SerializeField] private GameObject solarPanelOffVisual;
+        private bool solarPanelsOpenedToday = false;
+        private bool solarPanelsBeOpenedToday = false;
 
         //Радар опастности на следующий день
-        // [[Header("Радар опасности (следующий сол)")]
-        //[SerializeField] private GameObject radarAlertOnVisual; // Активная иконка Alert поверх уже существующей серой
-        //[SerializeField] private int normalRadiationDelta = 5;
-        //public bool IsDangerTomorrow { get; private set; } = false;
+        [Header("Радар опасности (следующий сол)")]
+        [SerializeField] private GameObject radarAlertOnVisual;
+        [SerializeField] private GameObject radarAlertOffVisual;
+        [SerializeField] private int normalRadiationDelta = 5;
+        public bool IsDangerTomorrow { get; private set; } = false;
 
         public event Action<SolScenario> OnSolStarted;
         public event Action OnStateChanged;
@@ -92,8 +93,8 @@ namespace MarsOutpost
         public SolScenario CurrentScenario =>
             (data != null && solIndex >= 0 && solIndex < data.sols.Count) ? data.sols[solIndex] : null;
         //доп свойство для Alert
-        // public SolScenario NextScenario =>
-        //     (data != null && solIndex =>&& solIndex + 1 < data.sol.Count) ? data.sols[solIndex + 1] : null;
+        public SolScenario NextScenario =>
+            (data != null && solIndex >= 0 && solIndex + 1 < data.sols.Count) ? data.sols[solIndex + 1] : null;
         public GameResult FinalResult { get; private set; }
 
         private MarsOutpostData data;
@@ -150,9 +151,6 @@ namespace MarsOutpost
         {
             solIndex = index;
             solarPanelsBeOpenedToday = false;
-
-            float energyRatio = (float)EnergyTotal / MaxEnergyCells;
-            Energy = Mathf.Clamp(Mathf.RoundToInt(energyRatio * maxValue), 0, maxValue);
             shieldsActiveToday = false;
 
             bool isDustStormToday = EnergyTotal < MaxEnergyCells;
@@ -163,15 +161,18 @@ namespace MarsOutpost
                 panelBonus = isDustStormToday ? -EnergyCellPercent : EnergyCellPercent;
             }
 
+            float energyRatio = (float)EnergyTotal / MaxEnergyCells;
+            Energy = Mathf.Clamp(Mathf.RoundToInt(energyRatio * maxValue), 0, maxValue);
+
             // Сбрасываем статус солнечных панелей на новый сол
             solarPanelsOpenedToday = false;
             UpdateSolarPanelsUI();
 
             //Проверяем будет ли опастность на следующий сол (в виде повышенной радиации либо пылевой бури)
-            // SolScenario tomorrow = NextScenario;
-            // IsDangerTomorrow = tomorrow != null &&
-            //     (tomorrow.baseRadiationDelta > normalRadiationDelta || tomorrow.availableEnergy < MaxEnergyCells)
-            // //UpdateRadarAlerUi()
+            SolScenario tomorrow = NextScenario;
+            IsDangerTomorrow = tomorrow != null &&
+                (tomorrow.baseRadiationDelta > normalRadiationDelta || tomorrow.availableEnergy < MaxEnergyCells);
+            UpdateRadarAlertUI();
 
             if (solNumberText != null) solNumberText.text = $"Sol {CurrentSol}";
             UpdateSliders();
@@ -421,7 +422,7 @@ namespace MarsOutpost
             NotifyPlayer("Water Plant active: +20% Water, +5% Radiation.");
         }
 
-        // Кнопка 3: Щиты жилого модуля (-15 Радиации, -1 ячейка / 25% Энергии)
+        // Кнопка 3: Щиты жилого модуля (-15 Радиации, -1 ячейка / 33% Энергии)
         public void ActivateHabitatShields()
         {
             if (Phase != GamePhase.Planning) return;
@@ -456,16 +457,11 @@ namespace MarsOutpost
         {
             if (Phase != GamePhase.Planning || solarPanelsBeOpenedToday) return;
 
-            // Если панели уже открывались сегодня — блокируем повторное открытие
             if (solarPanelsOpenedToday)
             {
                 NotifyPlayer("Solar panels have already been deployed today.");
                 return;
             }
-
-            
-            // // Проверяем наличие энергии (33%)
-            if (!TrySpendEnergyCell("Not enough energy to deploy solar panels.")) return;
 
             solarPanelsOpenedToday = true;
             solarPanelsBeOpenedToday = true;
@@ -473,7 +469,7 @@ namespace MarsOutpost
             UpdateSliders();
             UpdateSolarPanelsUI();
             NotifyChanged();
-            NotifyPlayer("Solar panels deployed successfully (-33% Energy).");
+            NotifyPlayer("Solar panels deployed successfully.");
         }
 
         public void CloseSolarPanels()
@@ -482,7 +478,7 @@ namespace MarsOutpost
             
             solarPanelsOpenedToday = false;
             solarPanelsBeOpenedToday = true;
-            UpdateSolarPanelsUI(); // Исправлено имя метода
+            UpdateSolarPanelsUI();
             NotifyChanged();
             NotifyPlayer("Solar panels retracted.");
         }
@@ -494,10 +490,11 @@ namespace MarsOutpost
             if (solarPanelOffVisual != null) solarPanelOffVisual.SetActive(!solarPanelsOpenedToday);
         }
 
-        // private void UpdateRadarAlertUI()
-        // {
-        //     if (radarAlertOnVisual != null) radarAlertOnVisual.SetActive(IsDangerTomorrow);
-        // }
+        private void UpdateRadarAlertUI()
+        {
+            if (radarAlertOnVisual != null) radarAlertOnVisual.SetActive(IsDangerTomorrow);
+            if (radarAlertOffVisual != null) radarAlertOffVisual.SetActive(!IsDangerTomorrow);
+        }
 
         private static void ApplySlider(SmoothSlider slider, float value, bool instant)
         {
