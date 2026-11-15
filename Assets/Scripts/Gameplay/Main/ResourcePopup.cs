@@ -11,7 +11,7 @@ namespace MarsOutpost
         [SerializeField] private TMP_Text popupText;
         [SerializeField] private Image iconImage;
         [SerializeField] private float yOffset = 1.5f;
-        private float lifetime = 60f;
+        private float lifetime = 89f;
 
         private Func<bool> onTryCollect;
         private Camera mainCamera;

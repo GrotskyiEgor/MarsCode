@@ -73,6 +73,7 @@ namespace MarsOutpost
         [SerializeField] private AudioSource sfxSource;
         [Range(0f, 1f)] [SerializeField] private float sfxVolume = 0.75f;
         [Range(0f, 1f)] [SerializeField] private float newSolVolume = 0.4f;
+        [Range(0f, 1f)] [SerializeField] private float warningVolume = 0.3f;
         [SerializeField] private AudioClip resourceCollectSfx; // Сбор еды/воды (первый раз)
         [SerializeField] private AudioClip taskMagicSfx;       // Магический звук выполнения задания
         [SerializeField] private AudioClip radiationRepairSfx; // Починка базы от радиации
@@ -347,13 +348,13 @@ namespace MarsOutpost
             {
                 currentNotificationText = "WARNING: Solar panels were left deployed during hazardous weather and suffered permanent damage! Energy output is reduced by 1 unit for the rest of the mission.";
                 if (panelsDamagedVoice != null) currentNotificationVoice = panelsDamagedVoice;
-                PlaySfx(warningSfx);
+                PlaySfx(warningSfx, warningVolume);
             }
             else if (lowPowerFromClosedPanels)
             {
                 currentNotificationText = "Solar panels were turned off, so only 1 unit of energy was generated today. Deploy the solar panels during the sol to restore power tomorrow!";
                 if (closedPanelsVoice != null) currentNotificationVoice = closedPanelsVoice;
-                PlaySfx(warningSfx);
+                PlaySfx(warningSfx, warningVolume);
             }
             else
             {
@@ -362,7 +363,7 @@ namespace MarsOutpost
 
             if (IsDangerTomorrow)
             {
-                PlaySfx(warningSfx);
+                PlaySfx(warningSfx, warningVolume);
                 if (!hasShownFirstAlertTutorial)
                 {
                     hasShownFirstAlertTutorial = true;
@@ -417,7 +418,15 @@ namespace MarsOutpost
         // Кнопка пропуска сола (работает как в фазе планирования, так и при открытом журнале)
         public void SkipSol()
         {
-            if (Phase == GamePhase.GameOver) return;
+            Debug.Log($"[GameManager] SkipSol() вызван! Текущая фаза: {Phase}");
+
+            if (Phase == GamePhase.GameOver || Phase == GamePhase.Error) return;
+
+            if (Phase == GamePhase.NotStarted)
+            {
+                StopAllCoroutines();
+                StartReadingPhase();
+            }
 
             if (Phase == GamePhase.Reading)
             {
@@ -511,10 +520,14 @@ namespace MarsOutpost
                 {
                     for (int i = 0; i < Mathf.Min(targetCount, ids.Length); i++)
                     {
-                        int cardIndex = Mathf.Clamp(ids[i], 0, pool.Count - 1);
-                        ActiveCrew.Add(pool[cardIndex]);
+                        int selectedId = ids[i];
+                        AstronautCard chosen = pool.Find(c => c.id == selectedId);
+                        if (chosen != null)
+                        {
+                            ActiveCrew.Add(chosen);
+                        }
                     }
-                    return;
+                    if (ActiveCrew.Count > 0) return;
                 }
             }
 
@@ -769,7 +782,7 @@ namespace MarsOutpost
             if (Phase != GamePhase.Planning) return;
             if (shieldsActiveToday)
             {
-                PlaySfx(warningSfx);
+                PlaySfx(warningSfx, warningVolume);
                 NotifyPlayer("Habitat Shields are already active today.");
                 return;
             }
@@ -948,7 +961,7 @@ namespace MarsOutpost
         {
             if (Energy < EnergyCellCost)
             {
-                PlaySfx(warningSfx);
+                PlaySfx(warningSfx, warningVolume);
                 NotifyPlayer(notEnoughMessage, notEnoughEnergyVoice);
                 return false;
             }
@@ -965,7 +978,7 @@ namespace MarsOutpost
 
             if (solarPanelsUsedToday)
             {
-                PlaySfx(warningSfx);
+                PlaySfx(warningSfx, warningVolume);
                 NotifyPlayer("Solar panels can only be deployed once per sol.");
                 return;
             }
