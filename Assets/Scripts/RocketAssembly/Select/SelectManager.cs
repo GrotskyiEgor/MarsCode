@@ -40,6 +40,8 @@ public class SelectManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        SetupUIButtons();
     }
 
     private void SetupUIButtons()
