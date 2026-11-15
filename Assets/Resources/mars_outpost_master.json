@@ -5,9 +5,9 @@
     {
       "solNumber": 1,
       "availableEnergy": 3,
-      "baseRadiationDelta": 5,
+      "baseRadiationDelta": 6,
       "eventTitle": "Landing in Jezero Crater",
-      "eventDescription": "All systems nominal. Solar panels are generating maximum energy (4 units).",
+      "eventDescription": "All systems nominal. Solar panels are generating maximum energy (3 units).",
       "radlabMeasurement": {
         "solNumber": 1,
         "location": "Mars orbit",
@@ -15,16 +15,16 @@
         "realTimestamp": "2021-05-01T00:00",
         "doseRate_uGy_hour": 16.02,
         "dailyDose_uGy_day": 384.5,
-        "gameBaseRadiationDelta": 5
+        "gameBaseRadiationDelta": 6
       },
       "nasaFact": "Base coordinates: 18.38°N, 77.58°E (NASA Mars Trek). Background radiation: 384.5 µGy/day (Liulin-MO-CD-Orbit)."
     },
     {
       "solNumber": 2,
       "availableEnergy": 3,
-      "baseRadiationDelta": 5,
+      "baseRadiationDelta": 10,
       "eventTitle": "Calm Martian Day",
-      "eventDescription": "A good time to start the greenhouse or water extraction.",
+      "eventDescription": "Clear skies (3 energy units), but radar detects dust fronts forming for tomorrow. Retract panels before ending the sol!",
       "radlabMeasurement": {
         "solNumber": 2,
         "location": "Mars orbit",
@@ -32,16 +32,16 @@
         "realTimestamp": "2021-05-02T22:52",
         "doseRate_uGy_hour": 16.89,
         "dailyDose_uGy_day": 405.4,
-        "gameBaseRadiationDelta": 5
+        "gameBaseRadiationDelta": 10
       },
       "nasaFact": "Daily radiation dose: 405.4 µGy/day (NASA RadLab, recorded on 2021-05-02)."
     },
     {
       "solNumber": 3,
       "availableEnergy": 2,
-      "baseRadiationDelta": 5,
+      "baseRadiationDelta": 14,
       "eventTitle": "Dust Devil!",
-      "eventDescription": "Wind blew Martian dust onto the solar arrays. Only 3 units of energy are available today!",
+      "eventDescription": "Martian dust swept across the valley! Power output dropped and radiation is +14%. Skies will clear tomorrow.",
       "radlabMeasurement": {
         "solNumber": 3,
         "location": "Mars orbit",
@@ -49,16 +49,16 @@
         "realTimestamp": "2021-05-04T21:02",
         "doseRate_uGy_hour": 17.55,
         "dailyDose_uGy_day": 421.2,
-        "gameBaseRadiationDelta": 5
+        "gameBaseRadiationDelta": 14
       },
-      "nasaFact": "According to Mars mission data (Mars Trek), dust reduces atmospheric transparency and solar panel efficiency."
+      "nasaFact": "According to NASA Mars Trek, atmospheric dust reduces solar panel efficiency while radiation reaches 421.2 µGy/day."
     },
     {
       "solNumber": 4,
       "availableEnergy": 3,
-      "baseRadiationDelta": 5,
-      "eventTitle": "Greenhouse Research",
-      "eventDescription": "Time to check how plants respond to Martian conditions.",
+      "baseRadiationDelta": 12,
+      "eventTitle": "Clear Skies & Greenhouse Window",
+      "eventDescription": "Atmosphere cleared (3 energy units). Warning: radar detects an M-class solar flare arriving tomorrow!",
       "radlabMeasurement": {
         "solNumber": 4,
         "location": "Mars orbit",
@@ -66,16 +66,16 @@
         "realTimestamp": "2021-05-06T19:53",
         "doseRate_uGy_hour": 17.64,
         "dailyDose_uGy_day": 423.4,
-        "gameBaseRadiationDelta": 5
+        "gameBaseRadiationDelta": 12
       },
       "nasaFact": "NASA OSDR study (OSD-520): cosmic radiation slows down plant growth without shielding."
     },
     {
       "solNumber": 5,
       "availableEnergy": 3,
-      "baseRadiationDelta": 8,
-      "eventTitle": "RADAR ALERT: Solar Flare!",
-      "eventDescription": "An M7.6-class solar flare has been detected! A powerful solar storm is approaching.",
+      "baseRadiationDelta": 23,
+      "eventTitle": "M7.6 Solar Flare!",
+      "eventDescription": "High-energy particles from an M7.6 flare hit the base (+23% radiation)! Keep panels retracted during flares.",
       "radlabMeasurement": {
         "solNumber": 5,
         "location": "Mars surface",
@@ -83,16 +83,16 @@
         "realTimestamp": "2021-05-08T19:49",
         "doseRate_uGy_hour": 8.09,
         "dailyDose_uGy_day": 194.2,
-        "gameBaseRadiationDelta": 5
+        "gameBaseRadiationDelta": 23
       },
       "nasaFact": "NASA DONKI (2024-09-30T23:37:00-FLR-001): M7.6-class flare from 2024-09-30."
     },
     {
       "solNumber": 6,
-      "availableEnergy": 2,
-      "baseRadiationDelta": 10,
-      "eventTitle": "Final Day of Preparation",
-      "eventDescription": "Dust has reduced energy to 3 units, and the storm is almost here! Reinforce the habitat module in time!",
+      "availableEnergy": 3,
+      "baseRadiationDelta": 12,
+      "eventTitle": "Calm Before the X9.0 Storm",
+      "eventDescription": "Quiet orbital window (3 energy units). RADAR ALERT: A massive X9.0 solar storm hits tomorrow! Reinforce the hull & close panels!",
       "radlabMeasurement": {
         "solNumber": 6,
         "location": "Mars orbit",
@@ -100,16 +100,16 @@
         "realTimestamp": "2021-05-10T19:53",
         "doseRate_uGy_hour": 27.36,
         "dailyDose_uGy_day": 656.6,
-        "gameBaseRadiationDelta": 5
+        "gameBaseRadiationDelta": 12
       },
       "nasaFact": "Peak orbital dose before the storm: 656.6 µGy/day (Liulin-MO-AB-Orbit, RadLab)."
     },
     {
       "solNumber": 7,
       "availableEnergy": 2,
-      "baseRadiationDelta": 40,
+      "baseRadiationDelta": 45,
       "eventTitle": "SOLAR STORM IMPACT (X9.0)!",
-      "eventDescription": "Peak radiation! Without reinforced hull plating and shields, contamination will spike by +40%!",
+      "eventDescription": "Peak radiation! Without reinforced hull plating (#5) and shields, radiation will spike by +45%!",
       "radlabMeasurement": {
         "solNumber": 7,
         "location": "Mars orbit",
@@ -117,7 +117,7 @@
         "realTimestamp": "2021-05-12T20:27",
         "doseRate_uGy_hour": 16.9,
         "dailyDose_uGy_day": 405.6,
-        "gameBaseRadiationDelta": 5
+        "gameBaseRadiationDelta": 45
       },
       "nasaFact": "Real extreme flare from NASA DONKI: X9.0 class (2024-10-03T12:08:00-FLR-001)."
     }
@@ -125,32 +125,32 @@
   "tasks": [
     {
       "id": 1,
-      "title": "Collect soil samples in the crater",
-      "nasaRef": "Terrain and geology of Jezero Crater (NASA Mars Trek)"
+      "title": "Collect soil & ice samples (+25% Water)",
+      "nasaRef": "Subsurface water ice in Jezero Crater (NASA Mars Trek)"
     },
     {
       "id": 2,
-      "title": "Check greenhouse airtightness",
+      "title": "Upgrade greenhouse airtightness (Better yield)",
       "nasaRef": "Closed-loop water cycle and food production (CSA Space Food Toolkit guide)"
     },
     {
       "id": 3,
-      "title": "Calibrate radiation sensors",
+      "title": "Calibrate radiation sensors (-3% Rad/sol)",
       "nasaRef": "Cross-check with NASA DONKI flare catalog (M7.6)"
     },
     {
       "id": 4,
-      "title": "Biological plant experiment",
+      "title": "High-yield crop experiment (-5 daily Food use)",
       "nasaRef": "NASA OSDR studies OSD-520 and OSD-269"
     },
     {
       "id": 5,
-      "title": "Reinforce the habitat module hull",
-      "nasaRef": "Reduces X9.0 storm damage on Sol 7 from +40% to +20% (OSDR OSD-336)"
+      "title": "Reinforce habitat hull (Storm protection)",
+      "nasaRef": "Reduces X9.0 storm damage on Sol 7 from +45% to +20% (OSDR OSD-336)"
     },
     {
       "id": 6,
-      "title": "Transmit scientific report to Earth",
+      "title": "Transmit report to Earth (+1 Energy & supplies)",
       "nasaRef": "Radio signal delay between Mars and Earth: 4 to 24 minutes"
     }
   ],

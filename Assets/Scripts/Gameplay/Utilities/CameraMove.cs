@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 
 public class CameraMove : MonoBehaviour
 {
+    public static CameraMove Instance;
+
     [Header("Movement Settings")]
     public bool canMove = true;
 
@@ -15,6 +17,11 @@ public class CameraMove : MonoBehaviour
     public float maxDistance = 50f;
 
     private Vector3 startPosition;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {

@@ -144,6 +144,12 @@ public class NotificationManager : MonoBehaviour
         while (isTyping)
             yield return null;
 
+        if (waitForVoiceEnd && voice != null)
+        {
+            while (voiceDelayCoroutine != null || (voiceSource != null && voiceSource.isPlaying))
+                yield return null;
+        }
+
         float fadePreTime = 2f;
         float waitBeforeFade = Mathf.Max(0f, notificationDuration - fadePreTime);
 

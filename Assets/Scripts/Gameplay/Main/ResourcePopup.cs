@@ -1,8 +1,8 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
 
 namespace MarsOutpost
 {
@@ -10,52 +10,55 @@ namespace MarsOutpost
     {
         [SerializeField] private TMP_Text popupText;
         [SerializeField] private Image iconImage;
-        private float lifetime = 20f; // Время жизни, пока игрок может забрать
+        [SerializeField] private float yOffset = 1.5f;
+        [SerializeField] private float lifetime = 60f;
 
-        private System.Action onCollected;
-
-        private Vector3 targetPos;
+        private Func<bool> onTryCollect;
         private Camera mainCamera;
 
-        public void Initialize(string message, Sprite icon, System.Action collectCallback)
+        public ResourcePopup Initialize(string message, Sprite icon, Func<bool> tryCollectCallback)
         {
-            onCollected = collectCallback;
-
+            onTryCollect = tryCollectCallback;
             mainCamera = Camera.main;
-            targetPos = transform.position + Vector3.up * 4f;
-            transform.position = targetPos;
+
+            transform.position += Vector3.up * yOffset;
 
             if (popupText != null) popupText.text = message;
             if (iconImage != null)
             {
-                if (icon != null) { iconImage.gameObject.SetActive(true); iconImage.sprite = icon; }
-                else { iconImage.gameObject.SetActive(false); }
+                if (icon != null)
+                {
+                    iconImage.gameObject.SetActive(true);
+                    iconImage.sprite = icon;
+                }
+                else
+                {
+                    iconImage.gameObject.SetActive(false);
+                }
             }
 
-            // Автоматически удаляем пузырек, если игрок его не собрал за отведенное время
-            Destroy(gameObject, lifetime);
+            return this;
+            // Destroy(gameObject, lifetime);
         }
 
         private void Update()
         {
-            // Чтобы пузырек всегда был повернут лицом к камере
             if (mainCamera != null)
             {
                 transform.rotation = mainCamera.transform.rotation;
             }
         }
 
-        // Этот метод автоматически вызывается Unity при клике мыши по UI-объекту (пузырьку)
         public void OnPointerClick(PointerEventData eventData)
         {
-            Debug.Log("[ResourcePopup] Кликнули по пузырьку!");
-            onCollected?.Invoke();
-            Destroy(gameObject);
-        }
+            if (GameManager.Instance != null && GameManager.Instance.Phase != GamePhase.Planning)
+                return;
 
-        private void OnDestroy()
-        {
-            Debug.Log("Пузырек был уничтожен! Прошло секунд: " + Time.time);
+            // Удаляем пузырёк только если сбор реально прошёл (хватило энергии)
+            if (onTryCollect != null && onTryCollect.Invoke())
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

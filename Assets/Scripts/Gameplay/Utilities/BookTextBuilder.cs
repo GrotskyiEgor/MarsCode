@@ -16,74 +16,90 @@ namespace MarsOutpost
             int hours = totalMinutes / 60;
             int minutes = totalMinutes % 60;
 
-            sb.AppendLine("<align=\"center\">");
+            sb.AppendLine("<margin=4%><line-height=118%><align=\"center\">");
 
-            sb.AppendLine($"<size=115%><b><color=#FF9E44>SOL {gm.CurrentSol}</color></b></size>  <color=#8FA3B8>|  {hours}h {minutes:D2}m</color>");
-            sb.AppendLine("<color=#4A5568>-----------------------------</color>");
+            // --- ШАПКА ЖУРНАЛА ---
+            sb.AppendLine($"<size=120%><b><color=#B84A00>SOL {gm.CurrentSol} / 7</color></b></size>  <color=#4A5568>|  {hours}h {minutes:D2}m</color>");
+            sb.AppendLine();
             sb.AppendLine();
 
             if (gm.CurrentSol == 1)
             {
-                sb.AppendLine("<b>WELCOME TO JEZERO CRATER, COMMANDER!</b>");
-                sb.AppendLine("Survive <b>7 sols</b> and protect the base from the coming solar storm.");
-                sb.AppendLine($"<color=#F6E05E>+{gm.EnergyTotal} Energy Cells</color> generated today.");
+                // --- БРИФИНГ ПЕРВОГО ДНЯ ---
+                sb.AppendLine("<size=105%><b><color=#1A202C>WELCOME TO JEZERO CRATER, COMMANDER!</color></b></size>");
+                sb.AppendLine("<color=#2D3748>Keep the outpost operational for <b>7 sols</b> and prepare the habitat for the incoming solar storm.</color>");
                 sb.AppendLine();
 
-                sb.AppendLine("<color=#63B3ED><b>CREW</b></color>");
+                // --- ЭКИПАЖ ---
+                sb.AppendLine("<color=#1E4E8C><b>- ACTIVE CREW -</b></color>");
                 if (gm.ActiveCrew != null && gm.ActiveCrew.Count > 0)
                 {
                     foreach (var crew in gm.ActiveCrew)
                     {
-                        sb.AppendLine($"{crew.name} {crew.surname} <color=#A0AEC0>({crew.profession})</color>");
+                        sb.AppendLine($"<color=#1A202C><b>{crew.name} {crew.surname}</b></color> <color=#4A5568>| {crew.profession}</color>");
                     }
                 }
                 else
                 {
-                    sb.AppendLine("<color=#A0AEC0>No crew assigned</color>");
+                    sb.AppendLine("<color=#4A5568>No crew assigned</color>");
                 }
                 sb.AppendLine();
 
-                sb.AppendLine("<color=#63B3ED><b>BASE STATUS & RULES</b></color>");
-                sb.AppendLine($"Food: <b>{gm.Food}%</b>  •  Water: <b>{gm.Water}%</b>  •  Rad: <b>{gm.Radiation}%</b>");
-                sb.AppendLine("<size=90%><color=#CBD5E0>Don't let Food/Water hit 0% or Radiation reach 100%.</color></size>");
+                // --- ЦЕЛИ И ПРАВИЛА ---
+                sb.AppendLine("<color=#1E4E8C><b>- MISSION DIRECTIVES -</b></color>");
+                sb.AppendLine($"<color=#975A16><b>Power Today:</b></color> <color=#1A202C><b>{gm.Energy} Energy Cells</b> (1 action = 1 cell)</color>");
+                sb.AppendLine($"<color=#22543D><b>Victory Goal:</b></color> <color=#1A202C>Complete <b>{gm.requiredTasks} Rover Tasks</b> & survive Sol 7</color>");
+                sb.AppendLine("<size=92%><color=#4A5568>Keep Food & Water above 0% and Radiation below 100%.</color></size>");
                 sb.AppendLine();
 
-                sb.AppendLine("<color=#63B3ED><b>CONTROLS</b></color>");
-                sb.AppendLine("<b>Research:</b> Complete 4 rover tasks to win");
-                sb.AppendLine("<b>Modules:</b> Spend energy on Food, Water & Shields");
                 sb.AppendLine();
+                sb.AppendLine($"<color=#1A202C>Food <b>{gm.Food}%</b>   |   Water <b>{gm.Water}%</b>   |   Rad <b>{gm.Radiation}%</b></color>");
 
-                sb.AppendLine("<i><color=#A0AEC0>Your onboard assistant will guide you ahead. Good luck!</color></i>");
-
-                notificationText = $"Welcome to Jezero Crater, Commander! Your solar arrays are online and generated {gm.EnergyTotal} energy cells for today's operations. Allocate your power wisely between life support and rover research before the Martian day ends.";
+                notificationText = $"Welcome to Jezero Crater, Commander! Your solar arrays are online and generated {gm.Energy} energy cells for today's operations. Allocate your power wisely between life support and rover research before the Martian day ends.";
             }
             else
             {
+                // --- ЕЖЕДНЕВНЫЙ ОТЧЁТ (СОЛЫ 2–7) ---
                 if (gm.CurrentScenario != null)
                 {
-                    sb.AppendLine($"<b><color=#F6AD55>{gm.CurrentScenario.eventTitle.ToUpper()}</color></b>");
-                    sb.AppendLine(gm.CurrentScenario.eventDescription);
-                    sb.AppendLine();
-                    sb.AppendLine($"<color=#F6E05E>Power Grid: +{gm.EnergyTotal} Energy Cells</color>");
-                    sb.AppendLine();
-                    sb.AppendLine($"<size=90%><i><color=#90CDF4>NASA Data: {gm.CurrentScenario.nasaFact}</color></i></size>");
+                    sb.AppendLine($"<size=108%><b><color=#9C4221>{gm.CurrentScenario.eventTitle.ToUpper()}</color></b></size>");
+                    sb.AppendLine($"<color=#2D3748>{gm.CurrentScenario.eventDescription}</color>");
                     sb.AppendLine();
 
-                    notificationText = $"Sol {gm.CurrentSol} report: {gm.CurrentScenario.eventTitle}. {gm.CurrentScenario.eventDescription} Your power grid generated {gm.EnergyTotal} energy cells—plan your module actions carefully.";
+                    // --- ПРОГНОЗ И ПРОГРЕСС ---
+                    sb.AppendLine("<color=#1E4E8C><b>- DAILY TELEMETRY -</b></color>");
+
+                    bool isPowerReduced = gm.Energy < gm.EnergyTotal;
+                    string powerDisplay = isPowerReduced
+                        ? $"<color=#9B2C2C><b>+{gm.Energy} Cell (Panels Off!)</b></color>"
+                        : $"<color=#975A16><b>+{gm.Energy} Cells</b></color>";
+
+                    sb.AppendLine($"<color=#1A202C>Power:</color> {powerDisplay}   <color=#4A5568>|</color>   <color=#1A202C>Rad Forecast:</color> <color=#9B2C2C><b>+{gm.CurrentScenario.baseRadiationDelta}%</b></color>");
+                    sb.AppendLine($"<color=#1A202C>Scientific Progress: <b>{gm.TasksCompleted} / {gm.requiredTasks} Tasks</b></color>");
+                    sb.AppendLine();
+
+                    // --- СПРАВКА NASA ---
+                    sb.AppendLine("<color=#1E4E8C><b>- NASA FIELD NOTE -</b></color>");
+                    sb.AppendLine($"<size=92%><i><color=#2C5282>{gm.CurrentScenario.nasaFact}</color></i></size>");
+                    sb.AppendLine();
+
+                    notificationText = $"Sol {gm.CurrentSol} report: {gm.CurrentScenario.eventTitle}. {gm.CurrentScenario.eventDescription} Your power grid generated {gm.Energy} energy cells - plan your module actions carefully.";
                 }
                 else
                 {
-                    sb.AppendLine($"<color=#F6E05E>Power Grid: +{gm.EnergyTotal} Energy Cells</color>");
+                    sb.AppendLine($"<color=#975A16><b>Power Grid: +{gm.Energy} Energy Cells</b></color>");
+                    sb.AppendLine($"<color=#1A202C>Scientific Progress: <b>{gm.TasksCompleted} / {gm.requiredTasks} Tasks</b></color>");
                     sb.AppendLine();
 
-                    notificationText = $"Sol {gm.CurrentSol} has begun on the Martian surface. Your solar arrays generated {gm.EnergyTotal} energy cells—manage your life support and research priorities wisely.";
+                    notificationText = $"Sol {gm.CurrentSol} has begun on the Martian surface. Your solar arrays generated {gm.Energy} energy cells - manage your life support and research priorities wisely.";
                 }
 
-                sb.AppendLine("<color=#4A5568>-----------------------------</color>");
-                sb.AppendLine($"Food <b>{gm.Food}%</b>  •  Water <b>{gm.Water}%</b>  •  Rad <b>{gm.Radiation}%</b>");
+                // --- НИЖНЯЯ СТРОКА СОСТОЯНИЯ ---
+                sb.AppendLine();
+                sb.AppendLine($"<color=#1A202C>Food <b>{gm.Food}%</b>   |   Water <b>{gm.Water}%</b>   |   Rad <b>{gm.Radiation}%</b></color>");
             }
 
-            sb.Append("</align>");
+            sb.Append("</align></line-height></margin>");
 
             Debug.Log("BookText and Notification text created.");
             return (sb.ToString(), notificationText);

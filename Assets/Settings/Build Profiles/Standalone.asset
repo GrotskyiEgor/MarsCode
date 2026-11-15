@@ -34,6 +34,9 @@ MonoBehaviour:
   - m_enabled: 1
     m_path: Assets/Scenes/RocketVideo.unity
     m_guid: 29189bbcad3887249931b66b1bbb2d06
+  - m_enabled: 1
+    m_path: Assets/Scenes/FinalScene.unity
+    m_guid: 62618dde33161be49a86551a1b104f08
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
@@ -42,6 +45,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 858217530731003972
       type: {class: WindowsPlatformSettings, ns: UnityEditor.WindowsStandalone, asm: UnityEditor.WindowsStandalone.Extensions}
       data:
