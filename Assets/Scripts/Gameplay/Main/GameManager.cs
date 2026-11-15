@@ -35,7 +35,9 @@ namespace MarsOutpost
         [SerializeField] private int hullReducedFlareDelta = 20;
         private readonly HashSet<int> completedTaskIds = new HashSet<int>();
         private bool shieldsActiveToday = false;
+
         public int TasksCompleted => completedTaskIds.Count;
+        public int RequiredTasks => requiredTasks;
         public bool IsTaskCompleted(int taskId) => completedTaskIds.Contains(taskId);
 
         [Header("Шкалы ресурсов")]
@@ -61,6 +63,12 @@ namespace MarsOutpost
         private bool solarPanelsOpenedToday = false; // Флаг: открывались ли панели в этом соле
         private bool solarPanelsBeOpenedToday = false; // Флаг: открывались ли панели в этом соле
 
+        //Радар опастности на следующий день
+        // [[Header("Радар опасности (следующий сол)")]
+        //[SerializeField] private GameObject radarAlertOnVisual; // Активная иконка Alert поверх уже существующей серой
+        //[SerializeField] private int normalRadiationDelta = 5;
+        //public bool IsDangerTomorrow { get; private set; } = false;
+
         public event Action<SolScenario> OnSolStarted;
         public event Action OnStateChanged;
         public event Action<GameResult> OnGameOver;
@@ -83,6 +91,9 @@ namespace MarsOutpost
         public bool IsFinalSol => data != null && solIndex == data.sols.Count - 1;
         public SolScenario CurrentScenario =>
             (data != null && solIndex >= 0 && solIndex < data.sols.Count) ? data.sols[solIndex] : null;
+        //доп свойство для Alert
+        // public SolScenario NextScenario =>
+        //     (data != null && solIndex =>&& solIndex + 1 < data.sol.Count) ? data.sols[solIndex + 1] : null;
         public GameResult FinalResult { get; private set; }
 
         private MarsOutpostData data;
@@ -144,9 +155,23 @@ namespace MarsOutpost
             Energy = Mathf.Clamp(Mathf.RoundToInt(energyRatio * maxValue), 0, maxValue);
             shieldsActiveToday = false;
 
+            bool isDustStormToday = EnergyTotal < MaxEnergyCells;
+            int panelBonus = 0;
+
+            if (solarPanelsOpenedToday)
+            {
+                panelBonus = isDustStormToday ? -EnergyCellPercent : EnergyCellPercent;
+            }
+
             // Сбрасываем статус солнечных панелей на новый сол
             solarPanelsOpenedToday = false;
             UpdateSolarPanelsUI();
+
+            //Проверяем будет ли опастность на следующий сол (в виде повышенной радиации либо пылевой бури)
+            // SolScenario tomorrow = NextScenario;
+            // IsDangerTomorrow = tomorrow != null &&
+            //     (tomorrow.baseRadiationDelta > normalRadiationDelta || tomorrow.availableEnergy < MaxEnergyCells)
+            // //UpdateRadarAlerUi()
 
             if (solNumberText != null) solNumberText.text = $"Sol {CurrentSol}";
             UpdateSliders();
@@ -438,7 +463,8 @@ namespace MarsOutpost
                 return;
             }
 
-            // Проверяем наличие энергии (33%)
+            
+            // // Проверяем наличие энергии (33%)
             if (!TrySpendEnergyCell("Not enough energy to deploy solar panels.")) return;
 
             solarPanelsOpenedToday = true;
@@ -467,6 +493,11 @@ namespace MarsOutpost
             if (solarPanelOnVisual != null) solarPanelOnVisual.SetActive(solarPanelsOpenedToday);
             if (solarPanelOffVisual != null) solarPanelOffVisual.SetActive(!solarPanelsOpenedToday);
         }
+
+        // private void UpdateRadarAlertUI()
+        // {
+        //     if (radarAlertOnVisual != null) radarAlertOnVisual.SetActive(IsDangerTomorrow);
+        // }
 
         private static void ApplySlider(SmoothSlider slider, float value, bool instant)
         {
