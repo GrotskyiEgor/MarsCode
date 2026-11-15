@@ -52,6 +52,12 @@ namespace MarsOutpost
         [SerializeField] private GameObject gameOverPanel;
         [SerializeField] private TMP_Text gameOverText;
 
+        // Энергия / Солнечные панели
+        [Header("Солнечные панели")]
+        [SerializeField] private GameObject solarPanelOnVisual;  // Объект/картинка "Включено"
+        [SerializeField] private GameObject solarPanelOffVisual; // Объект/картинка "Выключено"
+        private bool solarPanelsOpenedToday = false; // Флаг: открывались ли панели в этом соле
+
         public event Action<SolScenario> OnSolStarted;
         public event Action OnStateChanged;
         public event Action<GameResult> OnGameOver;
@@ -134,6 +140,10 @@ namespace MarsOutpost
             Energy = Mathf.Clamp(Mathf.RoundToInt(energyRatio * maxValue), 0, maxValue);
             shieldsActiveToday = false;
 
+            // Сбрасываем статус солнечных панелей на новый сол
+            solarPanelsOpenedToday = false;
+            UpdateSolarPanelsUI();
+
             if (solNumberText != null) solNumberText.text = $"Sol {CurrentSol}";
             UpdateSliders();
 
@@ -194,7 +204,7 @@ namespace MarsOutpost
             Food = Mathf.Clamp(Food - dailyFoodUse, 0, maxValue);
             Water = Mathf.Clamp(Water - dailyWaterUse, 0, maxValue);
 
-            // 2. Расчет радиации (если 7-й сол, укреплена обшивка и включены щиты — урон снижается до 20%)
+            // 2. Расчет радиации
             int radiationDelta = CurrentScenario != null ? CurrentScenario.baseRadiationDelta : 5;
             if (IsFinalSol && completedTaskIds.Contains(hullTaskId) && shieldsActiveToday)
             {
@@ -246,8 +256,6 @@ namespace MarsOutpost
                 AstronautCard chosen = (pool[randomIndex]);
                 ActiveCrew.Add(chosen);
                 pool.RemoveAt(randomIndex);
-
-                Debug.Log($"[GameManager] Выбран астронавт: #{i +1}: {chosen.name} {chosen.surname} - {chosen.profession} (ID: {chosen.id})");
             }
         }
 
@@ -255,7 +263,6 @@ namespace MarsOutpost
         {
             var reasons = new List<string>();
 
-            // 1. Проверка критических показателей на любом соле (1..7)
             if (Food <= 0)
                 reasons.Add("Food supplies ran out.");
             if (Water <= 0)
@@ -269,20 +276,17 @@ namespace MarsOutpost
                 return true;
             }
 
-            // 2. Если это ещё не 7-й сол — игра продолжается
             if (!IsFinalSol)
             {
                 return false;
             }
 
-            // 3. Финал 7-го сола: проверяем, выполнено ли минимум 4 научных задания
             if (TasksCompleted < requiredTasks)
             {
                 ShowGameOver(false, $"Defeat! You survived the solar storm, but completed only {TasksCompleted} of {requiredTasks} required scientific tasks.");
                 return true;
             }
 
-            // 4. Все условия выполнены — Победа
             ShowGameOver(true, $"Victory! The outpost survived the solar storm and completed {TasksCompleted} scientific tasks.");
             return true;
         }
@@ -315,6 +319,7 @@ namespace MarsOutpost
             data.sols.Sort((a, b) => a.solNumber.CompareTo(b.solNumber));
             return true;
         }
+
         private void Delay(float seconds, Action action)
         {
             StartCoroutine(DelayRoutine(seconds, action));
@@ -390,7 +395,7 @@ namespace MarsOutpost
             NotifyPlayer("Habitat Shields online: -15% Radiation.");
         }
 
-        // Кнопка 4: Отправить ровер на задание (1..6) (-10 Еды, +10 Радиации, -1 ячейка / 25% Энергии)
+        // Кнопка 4: Отправить ровер на задание
         public void ExecuteRoverTask(int taskId)
         {
             if (Phase != GamePhase.Planning) return;
@@ -404,6 +409,52 @@ namespace MarsOutpost
             UpdateSliders();
             NotifyChanged();
             NotifyPlayer($"Rover completed task #{taskId} ({TasksCompleted}/{requiredTasks} required).");
+        }
+
+        // --- УПРАВЛЕНИЕ СОЛНЕЧНЫМИ ПАНЕЛЯМИ ---
+
+        public void OpenSolarPanels()
+        {
+            if (Phase != GamePhase.Planning) return;
+
+            // Если панели уже открывались сегодня — блокируем повторное открытие
+            if (solarPanelsOpenedToday)
+            {
+                NotifyPlayer("Solar panels have already been deployed today.");
+                return;
+            }
+
+            // Проверяем наличие энергии (25%)
+            if (Energy < EnergyCellPercent) 
+            { 
+                NotifyPlayer("Not enough energy to deploy solar panels."); 
+                return; 
+            }
+
+            // Списываем 25% энергии и фиксируем открытие
+            Energy -= EnergyCellPercent;
+            solarPanelsOpenedToday = true;
+
+            UpdateSliders();
+            UpdateSolarPanelsUI();
+            NotifyChanged();
+            NotifyPlayer("Solar panels deployed successfully (-25% Energy).");
+        }
+
+        public void CloseSolarPanels()
+        {
+            if (Phase != GamePhase.Planning) return;
+            
+            solarPanelsOpenedToday = false;
+            UpdateSolarPanelsUI(); // Исправлено имя метода
+            NotifyChanged();
+            NotifyPlayer("Solar panels retracted.");
+        }
+
+        private void UpdateSolarPanelsUI()
+        {
+            if (solarPanelOnVisual != null) solarPanelOnVisual.SetActive(solarPanelsOpenedToday);
+            if (solarPanelOffVisual != null) solarPanelOffVisual.SetActive(!solarPanelsOpenedToday);
         }
 
         private static void ApplySlider(SmoothSlider slider, float value, bool instant)

@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SelectionManager : MonoBehaviour
+public class SelectManager : MonoBehaviour
 {
     [Header("Settings")]
     [Tooltip("Max people count")]
@@ -23,41 +23,12 @@ public class SelectionManager : MonoBehaviour
 
     private SelectableItem currentInspectingItem;
 
-    public static SelectionManager Instance { get; private set; }
+    public static SelectManager Instance { get; private set; }
 
     // Allows other scripts to check if the modal window currently holds focus
     public bool IsInfoOpen => infoPanel != null && infoPanel.activeSelf;
 
     #region -==- DATA -==-
-
-    private List<AstronautCard> allAstronauts = new List<AstronautCard>
-    {
-        new AstronautCard { id = 1, module = null, taskNumber = 0, name = "Alex", surname = "Morgan", profession = "Commander" },
-        new AstronautCard { id = 2, module = null, taskNumber = 0, name = "Sarah", surname = "Williams", profession = "Pilot" },
-        new AstronautCard { id = 3, module = null, taskNumber = 0, name = "Daniel", surname = "Anderson", profession = "Engineer" },
-        new AstronautCard { id = 4, module = null, taskNumber = 0, name = "Emily", surname = "Carter", profession = "Scientist" },
-        new AstronautCard { id = 5, module = null, taskNumber = 0, name = "Michael", surname = "Bennett", profession = "Doctor" },
-        new AstronautCard { id = 6, module = null, taskNumber = 0, name = "Olivia", surname = "Parker", profession = "Biologist" },
-        new AstronautCard { id = 7, module = null, taskNumber = 0, name = "James", surname = "Wilson", profession = "Mechanic" },
-        new AstronautCard { id = 8, module = null, taskNumber = 0, name = "Sophia", surname = "Turner", profession = "Geologist" },
-        new AstronautCard { id = 9, module = null, taskNumber = 0, name = "William", surname = "Harris", profession = "Technician" },
-        new AstronautCard { id = 10, module = null, taskNumber = 0, name = "Isabella", surname = "Scott", profession = "Astronomer" },
-        new AstronautCard { id = 11, module = null, taskNumber = 0, name = "Ethan", surname = "Brooks", profession = "Engineer" },
-        new AstronautCard { id = 12, module = null, taskNumber = 0, name = "Mia", surname = "Collins", profession = "Doctor" },
-        new AstronautCard { id = 13, module = null, taskNumber = 0, name = "Noah", surname = "Reed", profession = "Pilot" },
-        new AstronautCard { id = 14, module = null, taskNumber = 0, name = "Ava", surname = "Mitchell", profession = "Botanist" },
-        new AstronautCard { id = 15, module = null, taskNumber = 0, name = "Lucas", surname = "Foster", profession = "Physicist" },
-        new AstronautCard { id = 16, module = null, taskNumber = 0, name = "Charlotte", surname = "Hayes", profession = "Psychologist" },
-        new AstronautCard { id = 17, module = null, taskNumber = 0, name = "Benjamin", surname = "Cooper", profession = "Mechanic" },
-        new AstronautCard { id = 18, module = null, taskNumber = 0, name = "Amelia", surname = "Ward", profession = "Chemist" },
-        new AstronautCard { id = 19, module = null, taskNumber = 0, name = "Henry", surname = "Peterson", profession = "Geologist" },
-        new AstronautCard { id = 20, module = null, taskNumber = 0, name = "Grace", surname = "Murphy", profession = "Biologist" },
-        new AstronautCard { id = 21, module = null, taskNumber = 0, name = "Jack", surname = "Richardson", profession = "Technician" },
-        new AstronautCard { id = 22, module = null, taskNumber = 0, name = "Ella", surname = "Bailey", profession = "Scientist" },
-        new AstronautCard { id = 23, module = null, taskNumber = 0, name = "Ryan", surname = "Wood", profession = "Commander" },
-        new AstronautCard { id = 24, module = null, taskNumber = 0, name = "Lily", surname = "Bennett", profession = "Doctor" },
-        new AstronautCard { id = 25, module = null, taskNumber = 0, name = "David", surname = "Ross", profession = "Engineer" }
-    };
     #endregion
 
     private void Awake()
@@ -105,25 +76,75 @@ public class SelectionManager : MonoBehaviour
     {
         SelectableItem[] cards = FindObjectsByType<SelectableItem>();
 
-        if (cards.Length > allAstronauts.Count)
+        int requiredMale = 3;
+        int requiredFemale = 2;
+        int allRequired = requiredMale + requiredFemale;
+
+        if (cards.Length < allRequired)
         {
-            Debug.LogWarning("Cards > peoples in list");
+            Debug.LogWarning("Not enough cards in the scene!");
             return;
         }
 
-        // Shuffle list
-        for (int i = 0; i < allAstronauts.Count; i++)
+        // Получаем копию списка астронавтов
+        List<AstronautCard> astronauts =
+            new List<AstronautCard>(AstronautPresets.DefaultAstronauts);
+
+        // Разделяем по полу
+        List<AstronautCard> males = astronauts.FindAll(x => x.sex == "Male");
+        List<AstronautCard> females = astronauts.FindAll(x => x.sex == "Female");
+
+        if (males.Count < requiredMale || females.Count < requiredFemale)
         {
-            AstronautCard temp = allAstronauts[i];
-            int randomIndex = Random.Range(i, allAstronauts.Count);
-            allAstronauts[i] = allAstronauts[randomIndex];
-            allAstronauts[randomIndex] = temp;
+            Debug.LogWarning("Not enough astronauts of required gender!");
+            return;
         }
 
-        // Apply data to scene cards
-        for (int i = 0; i < cards.Length; i++)
+        // Перемешиваем списки
+        ShuffleAstronauts(males);
+        ShuffleAstronauts(females);
+        ShuffleList(new List<SelectableItem>(cards));
+
+        // Выбираем нужное количество
+        List<AstronautCard> selectedAstronauts = new List<AstronautCard>();
+
+        selectedAstronauts.AddRange(males.GetRange(0, requiredMale));
+        selectedAstronauts.AddRange(females.GetRange(0, requiredFemale));
+
+        // Перемешиваем итоговый список
+        ShuffleAstronauts(selectedAstronauts);
+
+        // Перемешиваем карточки
+        List<SelectableItem> shuffledCards = new List<SelectableItem>(cards);
+        ShuffleList(shuffledCards);
+
+        // Распределяем данные
+        for (int i = 0; i < allRequired; i++)
         {
-            cards[i].InitializeCard(allAstronauts[i]);
+            shuffledCards[i].InitializeCard(selectedAstronauts[i]);
+        }
+    }
+
+    private void ShuffleAstronauts(List<AstronautCard> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            int randomIndex = Random.Range(i, list.Count);
+            AstronautCard temp = list[i];
+            list[i] = list[randomIndex];
+            list[randomIndex] = temp;
+        }
+    }
+
+    // Helper method to shuffle any list randomly
+    private void ShuffleList(List<SelectableItem> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            SelectableItem temp = list[i];
+            int randomIndex = Random.Range(i, list.Count);
+            list[i] = list[randomIndex];
+            list[randomIndex] = temp;
         }
     }
 
@@ -200,4 +221,16 @@ public class SelectionManager : MonoBehaviour
             return true;
         }
     }
+
+    public int[] GetIdSelectedCards()
+    {
+        int[] res = new int[maxAllowedSelections];
+        for(int i = 0; i < maxAllowedSelections; i++)
+        {
+            res[i] = selectedItems[i].assignedData.id;
+        }
+        return res;
+    }
+
+    public bool IsMaxAllowedCardSelect() => selectedItems.Count == maxAllowedSelections;
 }

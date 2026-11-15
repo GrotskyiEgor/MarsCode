@@ -25,7 +25,7 @@ using UnityEngine;
 //    #endregion
 
 //    private bool isSelected = false;
-//    public bool IsSelected => isSelected; // Allows SelectionManager to check the selection status
+//    public bool IsSelected => isSelected; // Allows SelectManager to check the selection status
 
 //    // Use Awake to ensure text references are found before SelectionManager distributes cards in Start()
 //    private void Awake()
@@ -167,20 +167,20 @@ public class SelectableItem : MonoBehaviour
     private void OnMouseDown()
     {
         // Completely ignore 3D card clicks if the modal info panel is currently active
-        if (SelectionManager.Instance != null && SelectionManager.Instance.IsInfoOpen)
+        if (SelectManager.Instance != null && SelectManager.Instance.IsInfoOpen)
             return;
 
-        // Open the info panel via SelectionManager when clicking the card
-        if (SelectionManager.Instance != null)
+        // Open the info panel via SelectManager when clicking the card
+        if (SelectManager.Instance != null)
         {
-            SelectionManager.Instance.OpenCardInfo(this);
+            SelectManager.Instance.OpenCardInfo(this);
         }
     }
 
     private void OnMouseEnter()
     {
         // Ignore hover effects while modal window is open
-        if (SelectionManager.Instance != null && SelectionManager.Instance.IsInfoOpen)
+        if (SelectManager.Instance != null && SelectManager.Instance.IsInfoOpen)
             return;
 
         // Add your hover highlight logic here if needed

@@ -8,8 +8,12 @@ public class ButtonRocket : MonoBehaviour
     [SerializeField] private float hoverScaleMultiplier = 1.15f;
     [SerializeField] private string sceneToLoad = "RocketVideo";
 
+    private SelectManager selectionManager;
+
     void Start()
     {
+        selectionManager = FindAnyObjectByType<SelectManager>();
+        
         originalScale = transform.localScale;
     }
 
@@ -30,8 +34,15 @@ public class ButtonRocket : MonoBehaviour
 
         if (!string.IsNullOrEmpty(sceneToLoad))
         {
-            Debug.Log("Нажата кнопка! Запускаем затухание и переход на сцену: " + sceneToLoad);
-            SceneTransition.LoadScene(sceneToLoad);
+            if (selectionManager.IsMaxAllowedCardSelect())
+            {
+                Debug.Log("Нажата кнопка! Запускаем затухание и переход на сцену: " + sceneToLoad);
+                SceneTransition.LoadScene(sceneToLoad);
+            }
+            else
+            {
+                Debug.Log("Не выбрано нужное количество астронавтов.");
+            }
         }
         else
         {

@@ -97,6 +97,7 @@ namespace MarsOutpost
         public string name;
         public string surname;
         public string profession;
+        public string sex;
     }
 
     /// <summary>
@@ -204,31 +205,31 @@ namespace MarsOutpost
     {
         public static List<AstronautCard> DefaultAstronauts = new List<AstronautCard>
         {
-            new AstronautCard { id = 1, module = null, taskNumber = 0, name = "Alex", surname = "Morgan", profession = "Commander" },
-            new AstronautCard { id = 2, module = null, taskNumber = 0, name = "Sarah", surname = "Williams", profession = "Pilot" },
-            new AstronautCard { id = 3, module = null, taskNumber = 0, name = "Daniel", surname = "Anderson", profession = "Engineer" },
-            new AstronautCard { id = 4, module = null, taskNumber = 0, name = "Emily", surname = "Carter", profession = "Scientist" },
-            new AstronautCard { id = 5, module = null, taskNumber = 0, name = "Michael", surname = "Bennett", profession = "Doctor" },
-            new AstronautCard { id = 6, module = null, taskNumber = 0, name = "Olivia", surname = "Parker", profession = "Biologist" },
-            new AstronautCard { id = 7, module = null, taskNumber = 0, name = "James", surname = "Wilson", profession = "Mechanic" },
-            new AstronautCard { id = 8, module = null, taskNumber = 0, name = "Sophia", surname = "Turner", profession = "Geologist" },
-            new AstronautCard { id = 9, module = null, taskNumber = 0, name = "William", surname = "Harris", profession = "Technician" },
-            new AstronautCard { id = 10, module = null, taskNumber = 0, name = "Isabella", surname = "Scott", profession = "Astronomer" },
-            new AstronautCard { id = 11, module = null, taskNumber = 0, name = "Ethan", surname = "Brooks", profession = "Engineer" },
-            new AstronautCard { id = 12, module = null, taskNumber = 0, name = "Mia", surname = "Collins", profession = "Doctor" },
-            new AstronautCard { id = 13, module = null, taskNumber = 0, name = "Noah", surname = "Reed", profession = "Pilot" },
-            new AstronautCard { id = 14, module = null, taskNumber = 0, name = "Ava", surname = "Mitchell", profession = "Botanist" },
-            new AstronautCard { id = 15, module = null, taskNumber = 0, name = "Lucas", surname = "Foster", profession = "Physicist" },
-            new AstronautCard { id = 16, module = null, taskNumber = 0, name = "Charlotte", surname = "Hayes", profession = "Psychologist" },
-            new AstronautCard { id = 17, module = null, taskNumber = 0, name = "Benjamin", surname = "Cooper", profession = "Mechanic" },
-            new AstronautCard { id = 18, module = null, taskNumber = 0, name = "Amelia", surname = "Ward", profession = "Chemist" },
-            new AstronautCard { id = 19, module = null, taskNumber = 0, name = "Henry", surname = "Peterson", profession = "Geologist" },
-            new AstronautCard { id = 20, module = null, taskNumber = 0, name = "Grace", surname = "Murphy", profession = "Biologist" },
-            new AstronautCard { id = 21, module = null, taskNumber = 0, name = "Jack", surname = "Richardson", profession = "Technician" },
-            new AstronautCard { id = 22, module = null, taskNumber = 0, name = "Ella", surname = "Bailey", profession = "Scientist" },
-            new AstronautCard { id = 23, module = null, taskNumber = 0, name = "Ryan", surname = "Wood", profession = "Commander" },
-            new AstronautCard { id = 24, module = null, taskNumber = 0, name = "Lily", surname = "Bennett", profession = "Doctor" },
-            new AstronautCard { id = 25, module = null, taskNumber = 0, name = "David", surname = "Ross", profession = "Engineer" }
+            new AstronautCard { id = 1, module = null, taskNumber = 0, name = "Alex", surname = "Morgan", profession = "Commander", sex = "Male" },
+            new AstronautCard { id = 2, module = null, taskNumber = 0, name = "Sarah", surname = "Williams", profession = "Pilot", sex = "Female" },
+            new AstronautCard { id = 3, module = null, taskNumber = 0, name = "Daniel", surname = "Anderson", profession = "Engineer", sex = "Male" },
+            new AstronautCard { id = 4, module = null, taskNumber = 0, name = "Emily", surname = "Carter", profession = "Scientist", sex = "Female" },
+            new AstronautCard { id = 5, module = null, taskNumber = 0, name = "Michael", surname = "Bennett", profession = "Doctor", sex = "Male" },
+            new AstronautCard { id = 6, module = null, taskNumber = 0, name = "Olivia", surname = "Parker", profession = "Biologist", sex = "Female" },
+            new AstronautCard { id = 7, module = null, taskNumber = 0, name = "James", surname = "Wilson", profession = "Mechanic", sex = "Male" },
+            new AstronautCard { id = 8, module = null, taskNumber = 0, name = "Sophia", surname = "Turner", profession = "Geologist", sex = "Female" },
+            new AstronautCard { id = 9, module = null, taskNumber = 0, name = "William", surname = "Harris", profession = "Technician", sex = "Male" },
+            new AstronautCard { id = 10, module = null, taskNumber = 0, name = "Isabella", surname = "Scott", profession = "Astronomer", sex = "Female" },
+            new AstronautCard { id = 11, module = null, taskNumber = 0, name = "Ethan", surname = "Brooks", profession = "Engineer", sex = "Male" },
+            new AstronautCard { id = 12, module = null, taskNumber = 0, name = "Mia", surname = "Collins", profession = "Doctor", sex = "Female" },
+            new AstronautCard { id = 13, module = null, taskNumber = 0, name = "Noah", surname = "Reed", profession = "Pilot", sex = "Male" },
+            new AstronautCard { id = 14, module = null, taskNumber = 0, name = "Ava", surname = "Mitchell", profession = "Botanist", sex = "Female" },
+            new AstronautCard { id = 15, module = null, taskNumber = 0, name = "Lucas", surname = "Foster", profession = "Physicist", sex = "Male" },
+            new AstronautCard { id = 16, module = null, taskNumber = 0, name = "Charlotte", surname = "Hayes", profession = "Psychologist", sex = "Female" },
+            new AstronautCard { id = 17, module = null, taskNumber = 0, name = "Benjamin", surname = "Cooper", profession = "Mechanic", sex = "Male" },
+            new AstronautCard { id = 18, module = null, taskNumber = 0, name = "Amelia", surname = "Ward", profession = "Chemist", sex = "Female" },
+            new AstronautCard { id = 19, module = null, taskNumber = 0, name = "Henry", surname = "Peterson", profession = "Geologist", sex = "Male" },
+            new AstronautCard { id = 20, module = null, taskNumber = 0, name = "Grace", surname = "Murphy", profession = "Biologist", sex = "Female" },
+            new AstronautCard { id = 21, module = null, taskNumber = 0, name = "Jack", surname = "Richardson", profession = "Technician", sex = "Male" },
+            new AstronautCard { id = 22, module = null, taskNumber = 0, name = "Ella", surname = "Bailey", profession = "Scientist", sex = "Female" },
+            new AstronautCard { id = 23, module = null, taskNumber = 0, name = "Ryan", surname = "Wood", profession = "Commander", sex = "Male" },
+            new AstronautCard { id = 24, module = null, taskNumber = 0, name = "Lily", surname = "Bennett", profession = "Doctor", sex = "Female" },
+            new AstronautCard { id = 25, module = null, taskNumber = 0, name = "David", surname = "Ross", profession = "Engineer", sex = "Male" }
         };
     }
 }
