@@ -2580,7 +2580,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd72859982c64d445b8e76773a1cc7c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SolTimer
-  solDurationInSeconds: 15
+  solDurationInSeconds: 40
   startOnAwake: 1
 --- !u!1 &1266916576
 GameObject:
@@ -2614,11 +2614,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2003227218}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: -0.000061035156, y: 0}
+  m_SizeDelta: {x: 250, y: 30}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1266916578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3488,7 +3488,6 @@ MonoBehaviour:
   autoStart: 1
   startFood: 100
   startWater: 100
-  startEnergy: 100
   startRadiation: 0
   maxValue: 100
   dailyFoodUse: 10
@@ -3504,8 +3503,11 @@ MonoBehaviour:
   solStartVoice: {fileID: 8300000, guid: 7d4366a43195ff34e9b341337b11fc4f, type: 3}
   gameOverPanel: {fileID: 0}
   gameOverText: {fileID: 0}
+  mainMenuSceneName: MainUI
+  returnToMenuDelay: 5
   solarPanelOnVisual: {fileID: 1603630392}
   solarPanelOffVisual: {fileID: 25187345}
+  debugLog: 1
   bookText: 
   bookTextTMP: {fileID: 1735654139}
   bookPanel: {fileID: 948331430}
@@ -3737,13 +3739,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d8373406c560bd41b72cb11f600c8ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MarsOutpost.TaskListUI
-  counterText: {fileID: 0}
+  counterText: {fileID: 1692134975}
   toggleButton: {fileID: 2025837762}
   toggleArrowText: {fileID: 0}
   listContainer: {fileID: 1821849004}
   startExpanded: 0
-  itemsParent: {fileID: 0}
-  taskItemPrefab: {fileID: 0}
+  itemsParent: {fileID: 1821849005}
+  taskItemPrefab: {fileID: 2003227217}
 --- !u!1 &1603630392
 GameObject:
   m_ObjectHideFlags: 0
@@ -4420,6 +4422,7 @@ GameObject:
   - component: {fileID: 1821849006}
   - component: {fileID: 1821849008}
   - component: {fileID: 1821849009}
+  - component: {fileID: 1821849010}
   m_Layer: 5
   m_Name: ListContainer
   m_TagString: Untagged
@@ -4442,10 +4445,10 @@ RectTransform:
   - {fileID: 2003227218}
   m_Father: {fileID: 1572283251}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -229}
-  m_SizeDelta: {x: 250, y: 300}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 125, y: -110}
+  m_SizeDelta: {x: 250, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1821849006
 MonoBehaviour:
@@ -4507,7 +4510,7 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
+  m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
@@ -4533,6 +4536,20 @@ MonoBehaviour:
   m_LayoutPriority: 1
   m_MaxWidth: -1
   m_MaxHeight: -1
+--- !u!114 &1821849010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1821849004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1001 &1835253353
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4608,7 +4625,7 @@ GameObject:
   - component: {fileID: 2003227219}
   - component: {fileID: 2003227222}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4632,8 +4649,8 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_SizeDelta: {x: 0, y: 30}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2003227219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4729,8 +4746,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
   m_IgnoreLayout: 0
-  m_MinWidth: 40
-  m_MinHeight: -1
+  m_MinWidth: -1
+  m_MinHeight: 40
   m_PreferredWidth: -1
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
