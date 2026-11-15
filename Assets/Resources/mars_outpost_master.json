@@ -4,7 +4,7 @@
   "sols": [
     {
       "solNumber": 1,
-      "availableEnergy": 4,
+      "availableEnergy": 3,
       "baseRadiationDelta": 5,
       "eventTitle": "Landing in Jezero Crater",
       "eventDescription": "All systems nominal. Solar panels are generating maximum energy (4 units).",
@@ -21,7 +21,7 @@
     },
     {
       "solNumber": 2,
-      "availableEnergy": 4,
+      "availableEnergy": 3,
       "baseRadiationDelta": 5,
       "eventTitle": "Calm Martian Day",
       "eventDescription": "A good time to start the greenhouse or water extraction.",
@@ -38,7 +38,7 @@
     },
     {
       "solNumber": 3,
-      "availableEnergy": 3,
+      "availableEnergy": 2,
       "baseRadiationDelta": 5,
       "eventTitle": "Dust Devil!",
       "eventDescription": "Wind blew Martian dust onto the solar arrays. Only 3 units of energy are available today!",
@@ -55,7 +55,7 @@
     },
     {
       "solNumber": 4,
-      "availableEnergy": 4,
+      "availableEnergy": 3,
       "baseRadiationDelta": 5,
       "eventTitle": "Greenhouse Research",
       "eventDescription": "Time to check how plants respond to Martian conditions.",
@@ -72,7 +72,7 @@
     },
     {
       "solNumber": 5,
-      "availableEnergy": 4,
+      "availableEnergy": 3,
       "baseRadiationDelta": 8,
       "eventTitle": "RADAR ALERT: Solar Flare!",
       "eventDescription": "An M7.6-class solar flare has been detected! A powerful solar storm is approaching.",
@@ -89,7 +89,7 @@
     },
     {
       "solNumber": 6,
-      "availableEnergy": 3,
+      "availableEnergy": 2,
       "baseRadiationDelta": 10,
       "eventTitle": "Final Day of Preparation",
       "eventDescription": "Dust has reduced energy to 3 units, and the storm is almost here! Reinforce the habitat module in time!",
@@ -106,7 +106,7 @@
     },
     {
       "solNumber": 7,
-      "availableEnergy": 3,
+      "availableEnergy": 2,
       "baseRadiationDelta": 40,
       "eventTitle": "SOLAR STORM IMPACT (X9.0)!",
       "eventDescription": "Peak radiation! Without reinforced hull plating and shields, contamination will spike by +40%!",

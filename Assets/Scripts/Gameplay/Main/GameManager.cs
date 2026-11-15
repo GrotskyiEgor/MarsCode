@@ -22,8 +22,10 @@ namespace MarsOutpost
         [SerializeField] private int startEnergy = 100;
         [SerializeField] private int startRadiation = 0;
         [SerializeField] private int maxValue = 100;
-        private const int MaxEnergyCells = 4;
-        private const int EnergyCellPercent = 25; // 1 ячейка = 25%, 3 ячейки = 75%, 4 ячейки = 100%
+
+        //Три солнечные батареи
+        private const int MaxEnergyCells = 3;
+        private const int EnergyCellPercent = 33; // 1 ячейка = 33%, 2 ячейки = 67%, 3 ячейки = 100%
 
         [Header("Ежедневный расход экипажа")]
         [SerializeField] private int dailyFoodUse = 10;
@@ -57,6 +59,7 @@ namespace MarsOutpost
         [SerializeField] private GameObject solarPanelOnVisual;  // Объект/картинка "Включено"
         [SerializeField] private GameObject solarPanelOffVisual; // Объект/картинка "Выключено"
         private bool solarPanelsOpenedToday = false; // Флаг: открывались ли панели в этом соле
+        private bool solarPanelsBeOpenedToday = false; // Флаг: открывались ли панели в этом соле
 
         public event Action<SolScenario> OnSolStarted;
         public event Action OnStateChanged;
@@ -135,6 +138,7 @@ namespace MarsOutpost
         public void BeginSol(int index)
         {
             solIndex = index;
+            solarPanelsBeOpenedToday = false;
 
             float energyRatio = (float)EnergyTotal / MaxEnergyCells;
             Energy = Mathf.Clamp(Mathf.RoundToInt(energyRatio * maxValue), 0, maxValue);
@@ -352,13 +356,26 @@ namespace MarsOutpost
             NotifyChanged();
         }
 
-        // Кнопка 1: Теплица (+15 Еды, -10 Воды, -1 ячейка / 25% Энергии)
+        //Общий метод списания 1 батареи (33%), после 3-траты (100->67->34->0)
+        private bool TrySpendEnergyCell(string notEnoughEnergyMessage)
+        {
+            if(Energy < EnergyCellPercent)
+            {
+                NotifyPlayer(notEnoughEnergyMessage);
+                return false;
+            }
+
+            Energy -= EnergyCellPercent;
+            if(Energy < EnergyCellPercent) Energy = 0;
+            return true;
+        }
+
+        // Кнопка 1: Теплица (+15 Еды, -10 Воды, -1 ячейка / 33% Энергии)
         public void ActivateGreenhouse()
         {
             if (Phase != GamePhase.Planning) return;
-            if (Energy < EnergyCellPercent) { NotifyPlayer("Not enough energy to run the Greenhouse."); return; }
+            if (!TrySpendEnergyCell("Not enough energy to run the Greenhouse.")) return;
 
-            Energy -= EnergyCellPercent;
             Food = Mathf.Clamp(Food + 15, 0, maxValue);
             Water = Mathf.Clamp(Water - 10, 0, maxValue);
             UpdateSliders();
@@ -366,13 +383,12 @@ namespace MarsOutpost
             NotifyPlayer("Greenhouse cycle started: +15% Food, -10% Water.");
         }
 
-        // Кнопка 2: Водоочиститель (+20 Воды, +5 Радиации, -1 ячейка / 25% Энергии)
+        // Кнопка 2: Водоочиститель (+20 Воды, +5 Радиации, -1 ячейка / 33% Энергии)
         public void ActivateWaterPlant()
         {
             if (Phase != GamePhase.Planning) return;
-            if (Energy < EnergyCellPercent) { NotifyPlayer("Not enough energy to run the Water Plant."); return; }
+            if (!TrySpendEnergyCell("Not enough energy to run the Water Plant.")) return;
 
-            Energy -= EnergyCellPercent;
             Water = Mathf.Clamp(Water + 20, 0, maxValue);
             Radiation = Mathf.Clamp(Radiation + 5, 0, maxValue);
             UpdateSliders();
@@ -385,9 +401,8 @@ namespace MarsOutpost
         {
             if (Phase != GamePhase.Planning) return;
             if (shieldsActiveToday) { NotifyPlayer("Habitat Shields are already active today."); return; }
-            if (Energy < EnergyCellPercent) { NotifyPlayer("Not enough energy to power Habitat Shields."); return; }
+            if (!TrySpendEnergyCell("Not enough energy to power Habitat Shields.")) return;
 
-            Energy -= EnergyCellPercent;
             Radiation = Mathf.Clamp(Radiation - 15, 0, maxValue);
             shieldsActiveToday = true;
             UpdateSliders();
@@ -400,9 +415,8 @@ namespace MarsOutpost
         {
             if (Phase != GamePhase.Planning) return;
             if (completedTaskIds.Contains(taskId)) { NotifyPlayer("This research task is already completed."); return; }
-            if (Energy < EnergyCellPercent) { NotifyPlayer("Not enough energy for a Rover expedition."); return; }
+            if (!TrySpendEnergyCell("Not enough energy for a Rover expedition.")) return;
 
-            Energy -= EnergyCellPercent;
             Food = Mathf.Clamp(Food - 10, 0, maxValue);
             Radiation = Mathf.Clamp(Radiation + 10, 0, maxValue);
             completedTaskIds.Add(taskId);
@@ -415,7 +429,7 @@ namespace MarsOutpost
 
         public void OpenSolarPanels()
         {
-            if (Phase != GamePhase.Planning) return;
+            if (Phase != GamePhase.Planning || solarPanelsBeOpenedToday) return;
 
             // Если панели уже открывались сегодня — блокируем повторное открытие
             if (solarPanelsOpenedToday)
@@ -424,35 +438,32 @@ namespace MarsOutpost
                 return;
             }
 
-            // Проверяем наличие энергии (25%)
-            if (Energy < EnergyCellPercent) 
-            { 
-                NotifyPlayer("Not enough energy to deploy solar panels."); 
-                return; 
-            }
+            // Проверяем наличие энергии (33%)
+            if (!TrySpendEnergyCell("Not enough energy to deploy solar panels.")) return;
 
-            // Списываем 25% энергии и фиксируем открытие
-            Energy -= EnergyCellPercent;
             solarPanelsOpenedToday = true;
+            solarPanelsBeOpenedToday = true;
 
             UpdateSliders();
             UpdateSolarPanelsUI();
             NotifyChanged();
-            NotifyPlayer("Solar panels deployed successfully (-25% Energy).");
+            NotifyPlayer("Solar panels deployed successfully (-33% Energy).");
         }
 
         public void CloseSolarPanels()
         {
-            if (Phase != GamePhase.Planning) return;
+            if (Phase != GamePhase.Planning || solarPanelsBeOpenedToday) return;
             
             solarPanelsOpenedToday = false;
+            solarPanelsBeOpenedToday = true;
             UpdateSolarPanelsUI(); // Исправлено имя метода
             NotifyChanged();
             NotifyPlayer("Solar panels retracted.");
         }
 
         private void UpdateSolarPanelsUI()
-        {
+        {   
+            Debug.Log("ALOO");
             if (solarPanelOnVisual != null) solarPanelOnVisual.SetActive(solarPanelsOpenedToday);
             if (solarPanelOffVisual != null) solarPanelOffVisual.SetActive(!solarPanelsOpenedToday);
         }
