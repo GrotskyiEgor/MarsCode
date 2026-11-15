@@ -29,7 +29,6 @@ public class ButtonRocket : MonoBehaviour
 
     void OnMouseDown()
     {
-     
         transform.localScale = originalScale;
 
         if (!string.IsNullOrEmpty(sceneToLoad))

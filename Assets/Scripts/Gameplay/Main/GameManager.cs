@@ -85,6 +85,17 @@ namespace MarsOutpost
         private MarsOutpostData data;
         private int solIndex = -1;
 
+
+        // TODO: переменные для пузырьков
+        [Header("Всплывающие уведомления (Пузырьки)")]
+        [SerializeField] private GameObject resourcePopupPrefab;
+        [SerializeField] private Transform greenhouseSpawnPoint;
+        [SerializeField] private Transform waterPlantSpawnPoint;
+
+        [Header("Иконки для пузырьков")]
+        [SerializeField] private Sprite foodIcon;
+        [SerializeField] private Sprite waterIcon;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -194,6 +205,7 @@ namespace MarsOutpost
             NotificationManager.Instance?.ShowNotification(currentNotificationText, voice);
         }
 
+
         public void EndSol()
         {
             if (Phase != GamePhase.Planning) return;
@@ -213,7 +225,9 @@ namespace MarsOutpost
             Radiation = Mathf.Clamp(Radiation + radiationDelta, 0, maxValue);
 
             UpdateSliders();
-            Debug.Log($"[Sol {CurrentSol} Ended] Food: {Food}%, Water: {Water}%, Energy: {Energy}%, Radiation: {Radiation}% (+{radiationDelta}%)");
+
+            // Спавним пузырьки в конце сола
+            SpawnEndSolResourcePopups();
 
             // 3. Проверка победы или поражения
             if (CheckGameEnd())
@@ -221,8 +235,7 @@ namespace MarsOutpost
                 return;
             }
 
-            // 4. Переход на следующий сол
-            BeginSol(solIndex + 1);
+            NotifyPlayer("Sol ended.");
         }
 
         private void UpdateSliders(bool instant = false)
@@ -370,14 +383,18 @@ namespace MarsOutpost
         public void ActivateWaterPlant()
         {
             if (Phase != GamePhase.Planning) return;
-            if (Energy < EnergyCellPercent) { NotifyPlayer("Not enough energy to run the Water Plant."); return; }
+            if (Energy < EnergyCellPercent) { NotifyPlayer("Not enough energy to run the Greenhouse."); return; }
 
             Energy -= EnergyCellPercent;
-            Water = Mathf.Clamp(Water + 20, 0, maxValue);
-            Radiation = Mathf.Clamp(Radiation + 5, 0, maxValue);
+            Food = Mathf.Clamp(Food + 15, 0, maxValue);
+            Water = Mathf.Clamp(Water - 10, 0, maxValue);
             UpdateSliders();
             NotifyChanged();
-            NotifyPlayer("Water Plant active: +20% Water, +5% Radiation.");
+            NotifyPlayer("Water Plant started: +15% Food, -10% Water.");
+
+
+            // TODO: ВСТАВИЛ
+            //ShowResourcePopup("+15", foodIcon, greenhouseSpawnPoint, Color.green);
         }
 
         // Кнопка 3: Щиты жилого модуля (-15 Радиации, -1 ячейка / 25% Энергии)
@@ -393,6 +410,9 @@ namespace MarsOutpost
             UpdateSliders();
             NotifyChanged();
             NotifyPlayer("Habitat Shields online: -15% Radiation.");
+
+            // TODO: ВСТАВИЛ
+            //ShowResourcePopup("+20", waterIcon, waterPlantSpawnPoint, Color.cyan);
         }
 
         // Кнопка 4: Отправить ровер на задание
@@ -463,6 +483,53 @@ namespace MarsOutpost
 
             if (instant) slider.SetValueInstant(value);
             else slider.SetTargetValue(value);
+        }
+
+        // TODO: Добавлено появление пузырьков еды и воды.
+        public void SpawnEndSolResourcePopups()
+        {
+            // Пример: создаем пузырек еды над теплицей (дает +10 еды, стоит 1 энергии)
+            SpawnCollectiblePopup("+10", foodIcon, greenhouseSpawnPoint, () =>
+            {
+                if (Energy < EnergyCellPercent) // Проверка: если энергии меньше 25% (или 1 единицы)
+                {
+                    NotifyPlayer("Not enough energy to collect resources!");
+                    return;
+                }
+
+                Energy -= EnergyCellPercent; // Тратим энергию
+                Food = Mathf.Clamp(Food + 10, 0, maxValue); // Добавляем еду
+                UpdateSliders();
+                NotifyChanged();
+                NotifyPlayer("Collected food (+10), spent energy.");
+            });
+
+            // Пример: создаем пузырек воды над водоочистителем (дает +10 воды, стоит 1 энергии)
+            SpawnCollectiblePopup("+10", waterIcon, waterPlantSpawnPoint, () =>
+            {
+                if (Energy < EnergyCellPercent)
+                {
+                    NotifyPlayer("Not enough energy to collect resources!");
+                    return;
+                }
+
+                Energy -= EnergyCellPercent; // Тратим энергию
+                Water = Mathf.Clamp(Water + 10, 0, maxValue); // Добавляем воду
+                UpdateSliders();
+                NotifyChanged();
+                NotifyPlayer("Collected water (+10), spent energy.");
+            });
+        }
+
+        private void SpawnCollectiblePopup(string message, Sprite icon, Transform spawnPoint, System.Action onCollectAction)
+        {
+            if (resourcePopupPrefab == null || spawnPoint == null) return;
+
+            GameObject popupObj = Instantiate(resourcePopupPrefab, spawnPoint.position, Quaternion.identity);
+            if (popupObj.TryGetComponent<ResourcePopup>(out var popup))
+            {
+                popup.Initialize(message, icon, onCollectAction);
+            }
         }
     }
 }
