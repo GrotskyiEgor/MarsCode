@@ -19,25 +19,22 @@ namespace MarsOutpost
         [Header("Стартовые значения (0–100)")]
         [SerializeField] private int startFood = 100;
         [SerializeField] private int startWater = 80;
-        [SerializeField] private int startEnergy = 100;
+        [SerializeField] private int startEnergy = 3;
         [SerializeField] private int startRadiation = 0;
         [SerializeField] private int maxValue = 100;
-
-        //Три солнечные батареи
         private const int MaxEnergyCells = 3;
-        private const int EnergyCellPercent = 33; // 1 ячейка = 33%, 2 ячейки = 67%, 3 ячейки = 100%
+        private const int EnergyCellCost = 1;
+        public float EnergyPercent => (float)Energy / MaxEnergyCells * 100f;
 
         [Header("Ежедневный расход экипажа")]
         [SerializeField] private int dailyFoodUse = 10;
         [SerializeField] private int dailyWaterUse = 10;
-        [SerializeField] private int requiredTasks = 4;
+        [SerializeField] public int requiredTasks = 5;
         [SerializeField] private int hullTaskId = 5;
         [SerializeField] private int hullReducedFlareDelta = 20;
         private readonly HashSet<int> completedTaskIds = new HashSet<int>();
         private bool shieldsActiveToday = false;
-
         public int TasksCompleted => completedTaskIds.Count;
-        public int RequiredTasks => requiredTasks;
         public bool IsTaskCompleted(int taskId) => completedTaskIds.Contains(taskId);
 
         [Header("Шкалы ресурсов")]
@@ -58,17 +55,9 @@ namespace MarsOutpost
 
         // Энергия / Солнечные панели
         [Header("Солнечные панели")]
-        [SerializeField] private GameObject solarPanelOnVisual;
-        [SerializeField] private GameObject solarPanelOffVisual;
-        private bool solarPanelsOpenedToday = false;
-        private bool solarPanelsBeOpenedToday = false;
-
-        //Радар опастности на следующий день
-        [Header("Радар опасности (следующий сол)")]
-        [SerializeField] private GameObject radarAlertOnVisual;
-        [SerializeField] private GameObject radarAlertOffVisual;
-        [SerializeField] private int normalRadiationDelta = 5;
-        public bool IsDangerTomorrow { get; private set; } = false;
+        [SerializeField] private GameObject solarPanelOnVisual;  // Объект/картинка "Включено"
+        [SerializeField] private GameObject solarPanelOffVisual; // Объект/картинка "Выключено"
+        private bool solarPanelsOpenedToday = false; // Флаг: открывались ли панели в этом соле
 
         public event Action<SolScenario> OnSolStarted;
         public event Action OnStateChanged;
@@ -92,13 +81,21 @@ namespace MarsOutpost
         public bool IsFinalSol => data != null && solIndex == data.sols.Count - 1;
         public SolScenario CurrentScenario =>
             (data != null && solIndex >= 0 && solIndex < data.sols.Count) ? data.sols[solIndex] : null;
-        //доп свойство для Alert
-        public SolScenario NextScenario =>
-            (data != null && solIndex >= 0 && solIndex + 1 < data.sols.Count) ? data.sols[solIndex + 1] : null;
         public GameResult FinalResult { get; private set; }
 
         private MarsOutpostData data;
         private int solIndex = -1;
+
+
+        // TODO: переменные для пузырьков
+        [Header("Всплывающие уведомления (Пузырьки)")]
+        [SerializeField] private GameObject resourcePopupPrefab;
+        [SerializeField] private Transform greenhouseSpawnPoint;
+        [SerializeField] private Transform waterPlantSpawnPoint;
+
+        [Header("Иконки для пузырьков")]
+        [SerializeField] private Sprite foodIcon;
+        [SerializeField] private Sprite waterIcon;
 
         private void Awake()
         {
@@ -136,7 +133,7 @@ namespace MarsOutpost
 
             Food = Mathf.Clamp(startFood, 0, maxValue);
             Water = Mathf.Clamp(startWater, 0, maxValue);
-            Energy = Mathf.Clamp(startEnergy, 0, maxValue);
+            Energy = Mathf.Clamp(startEnergy, 0, MaxEnergyCells);
             Radiation = Mathf.Clamp(startRadiation, 0, maxValue);
 
             SelectRandomCrew(3);
@@ -150,29 +147,14 @@ namespace MarsOutpost
         public void BeginSol(int index)
         {
             solIndex = index;
-            solarPanelsBeOpenedToday = false;
-            shieldsActiveToday = false;
-
-            bool isDustStormToday = EnergyTotal < MaxEnergyCells;
-            int panelBonus = 0;
-
-            if (solarPanelsOpenedToday)
-            {
-                panelBonus = isDustStormToday ? -EnergyCellPercent : EnergyCellPercent;
-            }
 
             float energyRatio = (float)EnergyTotal / MaxEnergyCells;
-            Energy = Mathf.Clamp(Mathf.RoundToInt(energyRatio * maxValue), 0, maxValue);
+            Energy = Mathf.Clamp(EnergyTotal, 0, MaxEnergyCells);
+            shieldsActiveToday = false;
 
             // Сбрасываем статус солнечных панелей на новый сол
             solarPanelsOpenedToday = false;
             UpdateSolarPanelsUI();
-
-            //Проверяем будет ли опастность на следующий сол (в виде повышенной радиации либо пылевой бури)
-            SolScenario tomorrow = NextScenario;
-            IsDangerTomorrow = tomorrow != null &&
-                (tomorrow.baseRadiationDelta > normalRadiationDelta || tomorrow.availableEnergy < MaxEnergyCells);
-            UpdateRadarAlertUI();
 
             if (solNumberText != null) solNumberText.text = $"Sol {CurrentSol}";
             UpdateSliders();
@@ -224,6 +206,7 @@ namespace MarsOutpost
             NotificationManager.Instance?.ShowNotification(currentNotificationText, voice);
         }
 
+
         public void EndSol()
         {
             if (Phase != GamePhase.Planning) return;
@@ -243,7 +226,9 @@ namespace MarsOutpost
             Radiation = Mathf.Clamp(Radiation + radiationDelta, 0, maxValue);
 
             UpdateSliders();
-            Debug.Log($"[Sol {CurrentSol} Ended] Food: {Food}%, Water: {Water}%, Energy: {Energy}%, Radiation: {Radiation}% (+{radiationDelta}%)");
+
+            // Спавним пузырьки в конце сола
+            SpawnEndSolResourcePopups();
 
             // 3. Проверка победы или поражения
             if (CheckGameEnd())
@@ -251,15 +236,15 @@ namespace MarsOutpost
                 return;
             }
 
-            // 4. Переход на следующий сол
-            BeginSol(solIndex + 1);
+            NotifyPlayer("Sol ended.");
+            BeginSol(solIndex+1);
         }
 
         private void UpdateSliders(bool instant = false)
         {
             ApplySlider(foodSlider, Food, instant);
             ApplySlider(waterSlider, Water, instant);
-            ApplySlider(energySlider, Energy, instant);
+            ApplySlider(energySlider, EnergyPercent, instant);
             ApplySlider(radiationSlider, Radiation, instant);
         }
 
@@ -382,26 +367,13 @@ namespace MarsOutpost
             NotifyChanged();
         }
 
-        //Общий метод списания 1 батареи (33%), после 3-траты (100->67->34->0)
-        private bool TrySpendEnergyCell(string notEnoughEnergyMessage)
-        {
-            if(Energy < EnergyCellPercent)
-            {
-                NotifyPlayer(notEnoughEnergyMessage);
-                return false;
-            }
-
-            Energy -= EnergyCellPercent;
-            if(Energy < EnergyCellPercent) Energy = 0;
-            return true;
-        }
-
-        // Кнопка 1: Теплица (+15 Еды, -10 Воды, -1 ячейка / 33% Энергии)
+        // Кнопка 1: Теплица (+15 Еды, -10 Воды, -1 ячейка / 25% Энергии)
         public void ActivateGreenhouse()
         {
             if (Phase != GamePhase.Planning) return;
-            if (!TrySpendEnergyCell("Not enough energy to run the Greenhouse.")) return;
+            if (Energy < EnergyCellCost) { NotifyPlayer("Not enough energy to run the Greenhouse."); return; }
 
+            Energy -= EnergyCellCost;
             Food = Mathf.Clamp(Food + 15, 0, maxValue);
             Water = Mathf.Clamp(Water - 10, 0, maxValue);
             UpdateSliders();
@@ -409,31 +381,40 @@ namespace MarsOutpost
             NotifyPlayer("Greenhouse cycle started: +15% Food, -10% Water.");
         }
 
-        // Кнопка 2: Водоочиститель (+20 Воды, +5 Радиации, -1 ячейка / 33% Энергии)
+        // Кнопка 2: Водоочиститель (+20 Воды, +5 Радиации, -1 ячейка / 25% Энергии)
         public void ActivateWaterPlant()
         {
             if (Phase != GamePhase.Planning) return;
-            if (!TrySpendEnergyCell("Not enough energy to run the Water Plant.")) return;
+            if (Energy < EnergyCellCost) { NotifyPlayer("Not enough energy to run the Greenhouse."); return; }
 
-            Water = Mathf.Clamp(Water + 20, 0, maxValue);
-            Radiation = Mathf.Clamp(Radiation + 5, 0, maxValue);
+            Energy -= EnergyCellCost;
+            Food = Mathf.Clamp(Food + 15, 0, maxValue);
+            Water = Mathf.Clamp(Water - 10, 0, maxValue);
             UpdateSliders();
             NotifyChanged();
-            NotifyPlayer("Water Plant active: +20% Water, +5% Radiation.");
+            NotifyPlayer("Water Plant started: +15% Food, -10% Water.");
+
+
+            // TODO: ВСТАВИЛ
+            //ShowResourcePopup("+15", foodIcon, greenhouseSpawnPoint, Color.green);
         }
 
-        // Кнопка 3: Щиты жилого модуля (-15 Радиации, -1 ячейка / 33% Энергии)
+        // Кнопка 3: Щиты жилого модуля (-15 Радиации, -1 ячейка / 25% Энергии)
         public void ActivateHabitatShields()
         {
             if (Phase != GamePhase.Planning) return;
             if (shieldsActiveToday) { NotifyPlayer("Habitat Shields are already active today."); return; }
-            if (!TrySpendEnergyCell("Not enough energy to power Habitat Shields.")) return;
+            if (Energy < EnergyCellCost) { NotifyPlayer("Not enough energy to power Habitat Shields."); return; }
 
+            Energy -= EnergyCellCost;
             Radiation = Mathf.Clamp(Radiation - 15, 0, maxValue);
             shieldsActiveToday = true;
             UpdateSliders();
             NotifyChanged();
             NotifyPlayer("Habitat Shields online: -15% Radiation.");
+
+            // TODO: ВСТАВИЛ
+            //ShowResourcePopup("+20", waterIcon, waterPlantSpawnPoint, Color.cyan);
         }
 
         // Кнопка 4: Отправить ровер на задание
@@ -441,8 +422,9 @@ namespace MarsOutpost
         {
             if (Phase != GamePhase.Planning) return;
             if (completedTaskIds.Contains(taskId)) { NotifyPlayer("This research task is already completed."); return; }
-            if (!TrySpendEnergyCell("Not enough energy for a Rover expedition.")) return;
+            if (Energy < EnergyCellCost) { NotifyPlayer("Not enough energy for a Rover expedition."); return; }
 
+            Energy -= EnergyCellCost;
             Food = Mathf.Clamp(Food - 10, 0, maxValue);
             Radiation = Mathf.Clamp(Radiation + 10, 0, maxValue);
             completedTaskIds.Add(taskId);
@@ -455,8 +437,9 @@ namespace MarsOutpost
 
         public void OpenSolarPanels()
         {
-            if (Phase != GamePhase.Planning || solarPanelsBeOpenedToday) return;
+            if (Phase != GamePhase.Planning) return;
 
+            // Если панели уже открывались сегодня — блокируем повторное открытие
             if (solarPanelsOpenedToday)
             {
                 NotifyPlayer("Solar panels have already been deployed today.");
@@ -464,36 +447,27 @@ namespace MarsOutpost
             }
 
             solarPanelsOpenedToday = true;
-            solarPanelsBeOpenedToday = true;
 
             UpdateSliders();
             UpdateSolarPanelsUI();
             NotifyChanged();
-            NotifyPlayer("Solar panels deployed successfully.");
+            NotifyPlayer("Solar panels deployed successfully (-25% Energy).");
         }
 
         public void CloseSolarPanels()
         {
-            if (Phase != GamePhase.Planning || solarPanelsBeOpenedToday) return;
+            if (Phase != GamePhase.Planning) return;
             
             solarPanelsOpenedToday = false;
-            solarPanelsBeOpenedToday = true;
             UpdateSolarPanelsUI();
             NotifyChanged();
             NotifyPlayer("Solar panels retracted.");
         }
 
         private void UpdateSolarPanelsUI()
-        {   
-            Debug.Log("ALOO");
+        {
             if (solarPanelOnVisual != null) solarPanelOnVisual.SetActive(solarPanelsOpenedToday);
             if (solarPanelOffVisual != null) solarPanelOffVisual.SetActive(!solarPanelsOpenedToday);
-        }
-
-        private void UpdateRadarAlertUI()
-        {
-            if (radarAlertOnVisual != null) radarAlertOnVisual.SetActive(IsDangerTomorrow);
-            if (radarAlertOffVisual != null) radarAlertOffVisual.SetActive(!IsDangerTomorrow);
         }
 
         private static void ApplySlider(SmoothSlider slider, float value, bool instant)
@@ -502,6 +476,53 @@ namespace MarsOutpost
 
             if (instant) slider.SetValueInstant(value);
             else slider.SetTargetValue(value);
+        }
+
+        // TODO: Добавлено появление пузырьков еды и воды.
+        public void SpawnEndSolResourcePopups()
+        {
+            // Пример: создаем пузырек еды над теплицей (дает +10 еды, стоит 1 энергии)
+            SpawnCollectiblePopup("+10", foodIcon, greenhouseSpawnPoint, () =>
+            {
+                if (Energy < EnergyCellCost) // Проверка: если энергии меньше 25% (или 1 единицы)
+                {
+                    NotifyPlayer("Not enough energy to collect resources!");
+                    return;
+                }
+
+                Energy -= EnergyCellCost; // Тратим энергию
+                Food = Mathf.Clamp(Food + 10, 0, maxValue); // Добавляем еду
+                UpdateSliders();
+                NotifyChanged();
+                NotifyPlayer("Collected food (+10), spent energy.");
+            });
+
+            // Пример: создаем пузырек воды над водоочистителем (дает +10 воды, стоит 1 энергии)
+            SpawnCollectiblePopup("+10", waterIcon, waterPlantSpawnPoint, () =>
+            {
+                if (Energy < EnergyCellCost)
+                {
+                    NotifyPlayer("Not enough energy to collect resources!");
+                    return;
+                }
+
+                Energy -= EnergyCellCost; // Тратим энергию
+                Water = Mathf.Clamp(Water + 10, 0, maxValue); // Добавляем воду
+                UpdateSliders();
+                NotifyChanged();
+                NotifyPlayer("Collected water (+10), spent energy.");
+            });
+        }
+
+        private void SpawnCollectiblePopup(string message, Sprite icon, Transform spawnPoint, System.Action onCollectAction)
+        {
+            if (resourcePopupPrefab == null || spawnPoint == null) return;
+            
+            GameObject popupObj = Instantiate(resourcePopupPrefab, spawnPoint.position, Quaternion.identity);
+            if (popupObj.TryGetComponent<ResourcePopup>(out var popup))
+            {
+                popup.Initialize(message, icon, onCollectAction);
+            }
         }
     }
 }

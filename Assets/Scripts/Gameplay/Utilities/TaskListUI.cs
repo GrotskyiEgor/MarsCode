@@ -100,7 +100,7 @@ namespace MarsOutpost
             // 1. Обновляем счетчик (например: "Tasks: 2/4")
             if (counterText != null)
             {
-                counterText.text = $"Tasks: {gm.TasksCompleted}/{gm.RequiredTasks}";
+                counterText.text = $"Tasks: {gm.TasksCompleted}/{gm.requiredTasks}";
             }
 
             // 2. Обновляем статус каждой строки в списке
