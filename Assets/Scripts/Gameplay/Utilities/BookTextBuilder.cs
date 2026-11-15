@@ -80,7 +80,7 @@ namespace MarsOutpost
 
                     // --- СПРАВКА NASA ---
                     sb.AppendLine("<color=#1E4E8C><b>- NASA FIELD NOTE -</b></color>");
-                    sb.AppendLine($"<size=92%><i><color=#2C5282>{gm.CurrentScenario.nasaFact}</color></i></size>");
+                    sb.AppendLine($"<size=92%><color=#2C5282>{gm.CurrentScenario.nasaFact}</color></size>");
                     sb.AppendLine();
 
                     notificationText = $"Sol {gm.CurrentSol} report: {gm.CurrentScenario.eventTitle}. {gm.CurrentScenario.eventDescription} Your power grid generated {gm.Energy} energy cells - plan your module actions carefully.";

@@ -17,6 +17,8 @@ namespace MarsOutpost
         [SerializeField] private string resourcesFile = "mars_outpost_master";
         [SerializeField] private bool autoStart = true;
 
+        [SerializeField] private TMP_FontAsset gameOverFont;
+
         [Header("Стартовые значения (0–100)")]
         [SerializeField] private int startFood = 100;
         [SerializeField] private int startWater = 90;
@@ -30,7 +32,7 @@ namespace MarsOutpost
         [Header("Ежедневный расход экипажа")]
         private const int baseDailyFoodUse = 22;
         private const int baseDailyWaterUse = 22;
-        [SerializeField] public int requiredTasks = 4;
+        [SerializeField] public int requiredTasks = 5;
         [SerializeField] private int hullTaskId = 5;
         [SerializeField] private int hullReducedFlareDelta = 20;
         private readonly HashSet<int> completedTaskIds = new HashSet<int>();
@@ -44,8 +46,9 @@ namespace MarsOutpost
         [SerializeField] private SmoothSlider radiationSlider;
         [SerializeField] private SmoothSlider energySlider;
 
-        [Header("Текстовые поля")]
+        [Header("Текстовые поля и кнопки")]
         [SerializeField] private TMP_Text solNumberText;
+        [SerializeField] private Button skipSolButton;
 
         [Header("1. Озвучка: Утренние сводки (7 файлов: Sol 1..7)")]
         [SerializeField] private AudioClip[] solStartVoices = new AudioClip[7];
@@ -68,14 +71,14 @@ namespace MarsOutpost
 
         [Header("5. Звуковые эффекты (SFX)")]
         [SerializeField] private AudioSource sfxSource;
-        [Range(0f, 1f)] [SerializeField] private float sfxVolume = 0.85f;
+        [Range(0f, 1f)] [SerializeField] private float sfxVolume = 0.75f;
+        [Range(0f, 1f)] [SerializeField] private float newSolVolume = 0.4f;
         [SerializeField] private AudioClip resourceCollectSfx; // Сбор еды/воды (первый раз)
         [SerializeField] private AudioClip taskMagicSfx;       // Магический звук выполнения задания
         [SerializeField] private AudioClip radiationRepairSfx; // Починка базы от радиации
         [SerializeField] private AudioClip warningSfx;         // Звук предупреждения
         [SerializeField] private AudioClip solarSwitchSfx;     // Переключатель солнечных батарей
         [SerializeField] private AudioClip newSolSfx;          // Звук нового дня
-        [SerializeField] private AudioClip sliderSkateSfx;     // Звук скейта по рампе (для слайдеров)
         [SerializeField] private AudioClip buttonClickSfx;     // Звук клика по кнопке
 
         private AudioClip currentNotificationVoice;
@@ -186,6 +189,12 @@ namespace MarsOutpost
                 sfxSource = gameObject.AddComponent<AudioSource>();
                 sfxSource.playOnAwake = false;
             }
+
+            if (skipSolButton != null)
+            {
+                skipSolButton.onClick.RemoveListener(SkipSol);
+                skipSolButton.onClick.AddListener(SkipSol);
+            }
         }
 
         private void Start()
@@ -198,10 +207,11 @@ namespace MarsOutpost
             if (Instance == this) Instance = null;
         }
 
-        public void PlaySfx(AudioClip clip)
+        public void PlaySfx(AudioClip clip, float volumeOverride = -1f)
         {
             if (clip == null || sfxSource == null) return;
-            sfxSource.PlayOneShot(clip, sfxVolume);
+            float vol = volumeOverride >= 0f ? volumeOverride : sfxVolume;
+            sfxSource.PlayOneShot(clip, vol);
         }
 
         public void PlayButtonClick() => PlaySfx(buttonClickSfx);
@@ -268,7 +278,7 @@ namespace MarsOutpost
             ClearAllPopups();
 
             // Звук нового дня
-            PlaySfx(newSolSfx);
+            PlaySfx(newSolSfx, newSolVolume);
 
             if (index > 0 && solarPanelsOpen && IsHazardScenario(CurrentScenario))
             {
@@ -404,6 +414,22 @@ namespace MarsOutpost
             NotificationManager.Instance?.ShowNotification(currentNotificationText, voice);
         }
 
+        // Кнопка пропуска сола (работает как в фазе планирования, так и при открытом журнале)
+        public void SkipSol()
+        {
+            if (Phase == GamePhase.GameOver) return;
+
+            if (Phase == GamePhase.Reading)
+            {
+                ContinueFromReading();
+            }
+
+            if (Phase == GamePhase.Planning)
+            {
+                EndSol();
+            }
+        }
+
         public void EndSol()
         {
             SolTimer.Instance?.StopSol();
@@ -443,19 +469,10 @@ namespace MarsOutpost
 
         private void UpdateSliders(bool instant = false)
         {
-            bool changed = (Food != lastSliderFood) || (Water != lastSliderWater) ||
-                           (Radiation != lastSliderRad) || (Energy != lastSliderEnergy);
-
             lastSliderFood = Food;
             lastSliderWater = Water;
             lastSliderRad = Radiation;
             lastSliderEnergy = Energy;
-
-            // Звук скейта по рампе при плавном изменении слайдеров
-            if (!instant && changed)
-            {
-                PlaySfx(sliderSkateSfx);
-            }
 
             ApplySlider(foodSlider, Food, instant);
             ApplySlider(waterSlider, Water, instant);
@@ -688,6 +705,11 @@ namespace MarsOutpost
 
         private IEnumerator ReturnToMenuRoutine(bool won, string summaryText)
         {
+            if (gameOverText != null && gameOverFont != null)
+            {
+                gameOverText.font = gameOverFont;
+            }
+
             float remaining = returnToMenuDelay;
             while (remaining > 0f)
             {
@@ -771,7 +793,7 @@ namespace MarsOutpost
             }
             if (!TrySpendEnergy("Not enough energy to run Radiation Scrubber.")) return;
 
-            Radiation = Mathf.Clamp(Radiation - 20, 0, maxValue);
+            Radiation = Mathf.Clamp(Radiation - 50, 0, maxValue);
             PlaySfx(radiationRepairSfx); // Звук починки базы от радиации
             UpdateSliders();
             NotifyChanged();
@@ -780,13 +802,13 @@ namespace MarsOutpost
             {
                 hasShownDecontaminationTutorial = true;
                 NotifyPlayer(
-                    "Radiation Scrubber activated (-20% Rad)! Did you know? Unlike Earth, Mars has no global magnetic field, so active decontamination is essential to protect astronauts from cosmic rays.",
+                    "Radiation Scrubber activated (-50% Rad)! Did you know? Unlike Earth, Mars has no global magnetic field, so active decontamination is essential to protect astronauts from cosmic rays.",
                     decontaminationTutorialVoice
                 );
             }
             else
             {
-                NotifyPlayer("Radiation Scrubber activated: -20% Radiation.");
+                NotifyPlayer("Radiation Scrubber activated: -50% Radiation.");
             }
         }
 

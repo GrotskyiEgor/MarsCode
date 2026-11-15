@@ -2228,7 +2228,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1078189386
 Transform:
   m_ObjectHideFlags: 0
@@ -2257,7 +2257,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.7
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -2741,7 +2741,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd72859982c64d445b8e76773a1cc7c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SolTimer
-  solDurationInSeconds: 10
+  solDurationInSeconds: 20
   sun: {fileID: 1466423870}
   startAngle: 0
   sunYaw: 30
@@ -3506,6 +3506,7 @@ MonoBehaviour:
   masterJson: {fileID: 4900000, guid: be6d32ea7ef8591469f545c8be3109e6, type: 3}
   resourcesFile: mars_outpost_master
   autoStart: 1
+  gameOverFont: {fileID: 0}
   startFood: 100
   startWater: 100
   startRadiation: 0
@@ -3518,7 +3519,41 @@ MonoBehaviour:
   radiationSlider: {fileID: 1604602321}
   energySlider: {fileID: 1940176384}
   solNumberText: {fileID: 377579731}
-  solStartVoice: {fileID: 8300000, guid: 7d4366a43195ff34e9b341337b11fc4f, type: 3}
+  skipSolButton: {fileID: 0}
+  solStartVoices:
+  - {fileID: 8300000, guid: 1b92c94a2dbbeaf47a574df6a708bdaa, type: 3}
+  - {fileID: 8300000, guid: ffeb974af98e65b4b9f09ed4900c6eae, type: 3}
+  - {fileID: 8300000, guid: 58c7ca6de24124a45be752f89e41d3b2, type: 3}
+  - {fileID: 8300000, guid: 9d4a2eac0b3ab9f4ebf0be927b971ba8, type: 3}
+  - {fileID: 8300000, guid: c4166c7ff5615b740a444e63d27f52a6, type: 3}
+  - {fileID: 8300000, guid: fc830fbcd9f043a40838056deac4ea36, type: 3}
+  - {fileID: 8300000, guid: 7abd6e890bb5a1d479d89d0465936fa2, type: 3}
+  taskCompleteVoices:
+  - {fileID: 8300000, guid: 4680f451cbb2e274696d86bd4244c042, type: 3}
+  - {fileID: 8300000, guid: 0399cff32f39bc6439eee393fa185468, type: 3}
+  - {fileID: 8300000, guid: 54fc84133abb7d14abef5ad659136c71, type: 3}
+  - {fileID: 8300000, guid: 8405909dd48970e4f83e70ed1c62ee3c, type: 3}
+  - {fileID: 8300000, guid: 707d219de7f80b94ca1c674e6d5d4c21, type: 3}
+  - {fileID: 8300000, guid: c04365f01e8f3e249ab13e1d3eb6c13e, type: 3}
+  radarAlertTutorialVoice: {fileID: 8300000, guid: 4ff9c0d8b1967eb4580c15fba307ba3a, type: 3}
+  panelsDamagedVoice: {fileID: 8300000, guid: 71157741f683827479e1fbd57093557e, type: 3}
+  closedPanelsVoice: {fileID: 8300000, guid: 06f79447db6d6ae458808a65f00947ac, type: 3}
+  firstFoodVoice: {fileID: 8300000, guid: 3df7f785e42652a488baa91609207a10, type: 3}
+  firstWaterVoice: {fileID: 8300000, guid: 71799a2acce49254381f4c515f42f82c, type: 3}
+  decontaminationTutorialVoice: {fileID: 8300000, guid: 7623bf6df8f62ea4185eb38fa2f48554, type: 3}
+  notEnoughEnergyVoice: {fileID: 8300000, guid: be960e537649f3d4bb9586a8c2eea706, type: 3}
+  victoryVoice: {fileID: 8300000, guid: 4892f78ca8fb41e4aa8e395f711b3981, type: 3}
+  defeatVoice: {fileID: 8300000, guid: c2d73d8b757748a4ab6b9d715b5af01f, type: 3}
+  sfxSource: {fileID: 0}
+  sfxVolume: 0.85
+  newSolVolume: 0.4
+  resourceCollectSfx: {fileID: 8300000, guid: 2061559a23721984680a89f147b98e3d, type: 3}
+  taskMagicSfx: {fileID: 8300000, guid: 7ede6958e3729f84385d745cc4cd27f6, type: 3}
+  radiationRepairSfx: {fileID: 8300000, guid: 9e4d44abc49d60b4d8a279d2035df536, type: 3}
+  warningSfx: {fileID: 8300000, guid: 150ad015a9b1f1f43ae3d490393896d6, type: 3}
+  solarSwitchSfx: {fileID: 8300000, guid: b0319f6576f3a0f438c025a33b003a5e, type: 3}
+  newSolSfx: {fileID: 8300000, guid: c888be2b56a57a548aca7c34d9bc7e29, type: 3}
+  buttonClickSfx: {fileID: 8300000, guid: c83159a6699b74c4fa45ba8bd69ba7ea, type: 3}
   gameOverPanel: {fileID: 0}
   gameOverText: {fileID: 0}
   mainMenuSceneName: FinalScene
@@ -3581,8 +3616,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.92578, y: -434}
-  m_SizeDelta: {x: 243.3784, y: 125.3628}
+  m_AnchoredPosition: {x: 0.92584, y: -439.8}
+  m_SizeDelta: {x: 243.3784, y: 102.7908}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1566787044
 MonoBehaviour:
@@ -3653,14 +3688,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9811321, g: 0.39337844, b: 0.39337844, a: 1}
+  m_Color: {r: 0.47419012, g: 0.8330762, b: 0.9056604, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -8411708818706034061, guid: aa14610f9484bbc4a98253d1dc27c646, type: 3}
+  m_Sprite: {fileID: 3502715887467967171, guid: 99065343c66cf8645b278189ac11c7d8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4392,8 +4427,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.9258, y: -51.3331}
-  m_SizeDelta: {x: 732.6686, y: 742.913}
+  m_AnchoredPosition: {x: 0.9258, y: -34.0074}
+  m_SizeDelta: {x: 732.6686, y: 687.0156}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1735654139
 MonoBehaviour:
@@ -4417,8 +4452,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5041,6 +5076,7 @@ GameObject:
   - component: {fileID: 2116637906}
   - component: {fileID: 2116637905}
   - component: {fileID: 2116637904}
+  - component: {fileID: 2116637908}
   m_Layer: 5
   m_Name: UICanvas
   m_TagString: Untagged
@@ -5136,6 +5172,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &2116637908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2116637903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52a56b16eee5e9448907808af9a0d43e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MarsOutpost.UIButtonSound
 --- !u!1 &2125345093
 GameObject:
   m_ObjectHideFlags: 0
@@ -5170,8 +5218,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 458.7258, y: -302.0172}
-  m_SizeDelta: {x: 480.0298, y: 148.6555}
+  m_AnchoredPosition: {x: 458.7258, y: -303.47687}
+  m_SizeDelta: {x: 480.0298, y: 151.5748}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2125345095
 MonoBehaviour:
@@ -5195,8 +5243,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5220,8 +5268,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

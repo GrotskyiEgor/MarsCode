@@ -2,18 +2,6 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 
-
-// NotificationManager.Instance.ShowNotification(
-//     "Text",
-//     Voice
-// );
-
-// NotificationManager.Instance.ShowNotification(
-//     "Text"
-// );
-
-// NotificationManager.Instance.StopCurrentNotification();
-
 public class NotificationManager : MonoBehaviour
 {
     public static NotificationManager Instance { get; private set; }
@@ -23,10 +11,11 @@ public class NotificationManager : MonoBehaviour
     [SerializeField] private TMP_Text infoPanelText;
 
     [Header("Настройки текста")]
-    [SerializeField] private float textSpeed = 0.035f;
+    [SerializeField] private float textSpeed = 0.03f;
 
     [Header("Настройки уведомления")]
-    [SerializeField] private float notificationDuration = 30f;
+    [Tooltip("Сколько секунд панель остаётся на экране ПОСЛЕ окончания озвучки.")]
+    [SerializeField] private float notificationDuration = 5f;
     [SerializeField] private bool waitForVoiceEnd = true;
 
     [Header("Звуки интерфейса")]
@@ -37,13 +26,13 @@ public class NotificationManager : MonoBehaviour
 
     [Header("Громкость звуков")]
     [Range(0f, 1f)]
-    [SerializeField] private float appearVolume = 0.7f;
+    [SerializeField] private float appearVolume = 0.45f;
 
     [Range(0f, 1f)]
-    [SerializeField] private float ambientVolume = 0.35f;
+    [SerializeField] private float ambientVolume = 0.15f;
 
     [Range(0f, 1f)]
-    [SerializeField] private float disappearVolume = 0.8f;
+    [SerializeField] private float disappearVolume = 0.45f;
 
     [Header("Озвучка")]
     [SerializeField] private AudioSource voiceSource;
@@ -69,7 +58,8 @@ public class NotificationManager : MonoBehaviour
 
         Instance = this;
 
-        infoPanel.SetActive(false);
+        if (infoPanel != null)
+            infoPanel.SetActive(false);
 
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
@@ -86,7 +76,11 @@ public class NotificationManager : MonoBehaviour
 
         currentText = text;
 
-        infoPanel.SetActive(true);
+        if (infoPanel != null)
+            infoPanel.SetActive(true);
+
+        if (audioSource != null)
+            audioSource.volume = 1f;
 
         PlaySound(appearSound, appearVolume);
 
@@ -100,15 +94,12 @@ public class NotificationManager : MonoBehaviour
 
         if (voice != null && voiceSource != null)
         {
-            float delay = appearSound != null ? appearSound.length : 0f;
+            float delay = appearSound != null ? Mathf.Min(appearSound.length, 0.4f) : 0f;
             voiceDelayCoroutine = StartCoroutine(PlayVoiceAfterDelay(voice, delay));
         }
 
         typingCoroutine = StartCoroutine(TypeText());
-
-        notificationCoroutine = StartCoroutine(
-            NotificationTimer(voice)
-        );
+        notificationCoroutine = StartCoroutine(NotificationTimer(voice));
     }
 
     private IEnumerator PlayVoiceAfterDelay(AudioClip voice, float delay)
@@ -131,7 +122,6 @@ public class NotificationManager : MonoBehaviour
         foreach (char letter in currentText)
         {
             infoPanelText.text += letter;
-
             yield return new WaitForSeconds(textSpeed);
         }
 
@@ -150,7 +140,7 @@ public class NotificationManager : MonoBehaviour
                 yield return null;
         }
 
-        float fadePreTime = 2f;
+        float fadePreTime = 1.5f;
         float waitBeforeFade = Mathf.Max(0f, notificationDuration - fadePreTime);
 
         if (waitBeforeFade > 0f)
@@ -186,7 +176,7 @@ public class NotificationManager : MonoBehaviour
         audioSource.Stop();
         audioSource.loop = false;
         audioSource.clip = null;
-        audioSource.volume = ambientVolume;
+        audioSource.volume = 1f;
         fadeCoroutine = null;
     }
 
@@ -203,7 +193,7 @@ public class NotificationManager : MonoBehaviour
             audioSource.Stop();
             audioSource.loop = false;
             audioSource.clip = null;
-            audioSource.volume = ambientVolume;
+            audioSource.volume = 1f;
         }
 
         if (voiceSource != null)
@@ -211,7 +201,8 @@ public class NotificationManager : MonoBehaviour
 
         PlaySound(disappearSound, disappearVolume);
 
-        infoPanel.SetActive(false);
+        if (infoPanel != null)
+            infoPanel.SetActive(false);
 
         isTyping = false;
     }
@@ -247,7 +238,7 @@ public class NotificationManager : MonoBehaviour
             audioSource.Stop();
             audioSource.loop = false;
             audioSource.clip = null;
-            audioSource.volume = ambientVolume;
+            audioSource.volume = 1f;
         }
 
         if (voiceSource != null)
@@ -261,8 +252,8 @@ public class NotificationManager : MonoBehaviour
         if (clip == null || audioSource == null)
             return;
 
-        float targetScale = audioSource.volume > 0f ? volume / audioSource.volume : volume;
-        audioSource.PlayOneShot(clip, targetScale);
+        float scale = audioSource.volume > 0f ? volume / audioSource.volume : volume;
+        audioSource.PlayOneShot(clip, scale);
     }
 
     private void OnDestroy()
